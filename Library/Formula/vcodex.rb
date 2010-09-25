@@ -14,14 +14,11 @@ class VcodexDownloadStrategy <CurlDownloadStrategy
 end
 
 class Vcodex <Formula
-  url 'http://www2.research.att.com/~gsf/download/tgz.att-src/vcodex.2005-05-22.tgz'
+  url 'http://www2.research.att.com/~gsf/download/tgz.att-src/vcodex.2005-05-22.tgz',
+      :using => VcodexDownloadStrategy
   homepage 'http://www2.research.att.com/~gsf/download/ref/vcodex/vcodex.html'
   md5 'a773e26272568dbd182b7664802f7d29'
   version '2005-05-22'
-
-  def download_strategy
-    VcodexDownloadStrategy
-  end
 
   def patches
     DATA
@@ -42,9 +39,14 @@ class Vcodex <Formula
     system "/bin/sh ./Runmake"
     # install manually
     bin.install Dir['bin/vc*']
-    (include + "#{name}").install Dir['include/*.h']
+    # put all includes into a directory of their own
+    (include + "vcodex").install Dir['include/*.h']
     lib.install Dir['lib/*.a']
     man.install 'man/man3'
+  end
+
+  def caveats
+    "We agreed to the AT&T Source Code License for you.\nIf this is unacceptable you should uninstall."
   end
 end
 
