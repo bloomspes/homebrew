@@ -14,14 +14,11 @@ class VmallocDownloadStrategy <CurlDownloadStrategy
 end
 
 class Vmalloc <Formula
-  url 'http://www2.research.att.com/~gsf/download/tgz/vmalloc.2005-02-01.tgz'
+  url 'http://www2.research.att.com/~gsf/download/tgz/vmalloc.2005-02-01.tgz',
+      :using => VmallocDownloadStrategy
   homepage 'http://www2.research.att.com/sw/download/'
   md5 '564db0825820ecd18308de2933075980'
   version '2005-02-01'
-
-  def download_strategy
-    VmallocDownloadStrategy
-  end
 
   def install
     # Vmalloc makefile does not work in parallel mode
@@ -35,8 +32,13 @@ class Vmalloc <Formula
     # make all Vmalloc stuff
     system "/bin/sh ./Runmake"
     # install manually
-    (include + "#{name}").install Dir['include/*.h']
+    # put all includes into a directory of their own
+    (include + "vmalloc").install Dir['include/*.h']
     lib.install Dir['lib/*.a']
     man.install 'man/man3'
+  end
+
+  def caveats
+    "We agreed to the OSI Common Public License Version 1.0 for you.\nIf this is unacceptable you should uninstall."
   end
 end
