@@ -8,7 +8,7 @@ class Quantlib <Formula
   depends_on 'boost'
 
   def install
-    system "./configure", "--disable-debug", "--disable-dependency-tracking",
+    system "./configure", "--disable-dependency-tracking",
                           "--prefix=#{prefix}"
     system "make install"
   end
