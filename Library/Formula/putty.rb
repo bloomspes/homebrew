@@ -14,13 +14,12 @@ class Putty <Formula
                           "--disable-gtktest", "--with-gtk-prefix=/dev/null"
     system "make VER=-DRELEASE=#{version} all-cli"
     # install manually
-    bin.install ["plink", "pscp", "psftp", "puttygen"]
-    man1.install ["../doc/plink.1", "../doc/pscp.1", 
-                  "../doc/psftp.1", "../doc/puttygen.1"]
+    bin.install %w{ plink pscp psftp puttygen }
+    cd "../doc"
+    man1.install %w{ plink.1 pscp.1 psftp.1 puttygen.1 }
   end
 
   def caveats
     "This formula did not build the Mac OS X GUI PuTTY.app."
   end
-
 end
