@@ -1,9 +1,19 @@
 require 'formula'
 
+def build_mpi?; ARGV.include? "--mpi"; end
+def build_universal?; ARGV.include? "--universal"; end
+
 class Boost <Formula
   homepage 'http://www.boost.org'
   url 'http://downloads.sourceforge.net/project/boost/boost/1.44.0/boost_1_44_0.tar.bz2'
   md5 'f02578f5218f217a9f20e9c30e119c6a'
+
+  def options
+    [
+      ['--mpi', 'Build Message Passing Interface library.'],
+      ['--universal', 'Build as a Universal binary.'],
+    ]
+  end
 
   def install
     fails_with_llvm "LLVM-GCC causes errors with dropped arguments to "+
@@ -30,16 +40,19 @@ class Boost <Formula
     # Force boost to compile using the GCC 4.2 compiler
     open("user-config.jam", "a") do |file|
       file.write "using darwin : : #{ENV['CXX']} ;\n"
+      file.write "using mpi ;\n" if build_mpi?
     end
 
-    # we specify libdir too because the script is apparently broken
     system "./bootstrap.sh", "--prefix=#{prefix}", "--libdir=#{lib}"
-    system "./bjam", "--prefix=#{prefix}",
-                     "--libdir=#{lib}",
-                     "-j#{Hardware.processor_count}",
-                     "--layout=tagged",
-                     "--user-config=user-config.jam",
-                     "threading=multi",
-                     "install"
+    # we specify libdir too because the script is apparently broken
+    args = ["--prefix=#{prefix}",
+            "--libdir=#{lib}",
+            "-j#{Hardware.processor_count}",
+            "--layout=tagged",
+            "--user-config=user-config.jam",
+            "threading=multi"]
+    args << "architecture=x86" << "address-model=32_64" if build_universal?
+    args << "install"
+    system "./bjam", *args
   end
 end
