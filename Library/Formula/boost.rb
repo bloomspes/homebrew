@@ -15,13 +15,6 @@ class Boost <Formula
     ]
   end
 
-  def patches
-    # PPC needs patch
-    if build_universal?
-      DATA
-    end
-  end
-
   def install
     fails_with_llvm "LLVM-GCC causes errors with dropped arguments to "+
                     "functions when linking with boost"
@@ -58,36 +51,8 @@ class Boost <Formula
             "--layout=tagged",
             "--user-config=user-config.jam",
             "threading=multi"]
-    args << "architecture=combined" << "address-model=32_64" if build_universal?
+    args << "architecture=x86" << "address-model=32_64" if build_universal?
     args << "install"
     system "./bjam", *args
   end
 end
-
-__END__
-diff --git a/boost/archive/basic_binary_iarchive.hpp b/boost/archive/basic_binary_iarchive.hpp
-index d756926..bd42766 100644
---- a/boost/archive/basic_binary_iarchive.hpp
-+++ b/boost/archive/basic_binary_iarchive.hpp
-@@ -71,7 +71,7 @@ public:
- 
-     // include these to trap a change in binary format which
-     // isn't specifically handled
--    BOOST_STATIC_ASSERT(sizeof(tracking_type) == sizeof(char));
-+    BOOST_STATIC_ASSERT(sizeof(tracking_type) == sizeof(bool));
-     // upto 32K classes
-     BOOST_STATIC_ASSERT(sizeof(class_id_type) == sizeof(int_least16_t));
-     BOOST_STATIC_ASSERT(sizeof(class_id_reference_type) == sizeof(int_least16_t));
-diff --git a/boost/archive/basic_binary_oarchive.hpp b/boost/archive/basic_binary_oarchive.hpp
-index f20471a..9465c1d 100644
---- a/boost/archive/basic_binary_oarchive.hpp
-+++ b/boost/archive/basic_binary_oarchive.hpp
-@@ -76,7 +76,7 @@ public:
- 
-     // include these to trap a change in binary format which
-     // isn't specifically handled
--    BOOST_STATIC_ASSERT(sizeof(tracking_type) == sizeof(char));
-+    BOOST_STATIC_ASSERT(sizeof(tracking_type) == sizeof(bool));
-     // upto 32K classes
-     BOOST_STATIC_ASSERT(sizeof(class_id_type) == sizeof(int_least16_t));
-     BOOST_STATIC_ASSERT(sizeof(class_id_reference_type) == sizeof(int_least16_t));
