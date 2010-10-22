@@ -57,7 +57,7 @@ index 8bb64cc..d319c5a 100644
  extern char*		_sfcvt _ARG_((Sfdouble_t,char*,size_t,int,int*,int*,int*,int));
  extern char**		_sfgetpath _ARG_((char*));
 -extern Sfdouble_t	_sfdscan _ARG_((Void_t*, int(*)(Void_t*,int)));
- 
+
  #if _BLD_sfio && defined(__EXPORT__)
  #define extern		__EXPORT__
 diff --git a/src/lib/vcodex/Vchuff/vchbits.c b/src/lib/vcodex/Vchuff/vchbits.c
@@ -66,7 +66,7 @@ index 1bba200..c275bca 100644
 +++ b/src/lib/vcodex/Vchuff/vchbits.c
 @@ -21,7 +21,7 @@ Void_t*	two;
  }
- 
+
  #if __STD_C
 -int vchbits(ssize_t* size, Vcbits_t* bits)
 +ssize_t vchbits(ssize_t* size, Vcbits_t* bits)
@@ -79,7 +79,7 @@ index e6df6b6..365eaaa 100644
 +++ b/src/lib/vcodex/Vchuff/vchsize.c
 @@ -32,7 +32,7 @@ Void_t* two;
  }
- 
+
  #if __STD_C
 -int vchsize(ssize_t* freq, ssize_t* size, int* runb)
 +ssize_t vchsize(ssize_t* freq, ssize_t* size, int* runb)
@@ -102,7 +102,7 @@ index dcf5112..ec5e5ae 100644
 @@ -38,6 +38,10 @@ typedef struct _vcbuf_s
  #include	<varargs.h>
  #endif
- 
+
 +#if _hdr_string
 +#include	<string.h>
 +#endif
