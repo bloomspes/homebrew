@@ -7,8 +7,7 @@ class Zdelta <Formula
 
   def install
     system "make test"
-    bin.install("zdc")
-    bin.install("zdu")
     system "make install prefix=#{prefix}"
+    bin.install ["zdc", "zdu"]
   end
 end
