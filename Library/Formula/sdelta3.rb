@@ -6,24 +6,25 @@ class Sdelta3 <Formula
   md5 'f419f4e7ade7751cf2feacbebfbc8aa9'
   version '20100323'
 
-  def patches
-    DATA
-  end
+  def patches; DATA; end
 
   def install
     # Sdelta3 code is not 64-bit clean
     ENV.m32
-    # fix Makefile
+
     inreplace 'Makefile' do |s|
       s.change_make_var! "PREFIX", prefix
       s.change_make_var! "CC", ENV.cc
       s.change_make_var! "CFLAGS", ENV.cflags
     end
+
     # fix verbatim references to /usr
     inreplace 'sd3', "/usr/share", "#{HOMEBREW_PREFIX}/share"
+
     # fix incorrect help message referencing LICENSE file in sdelta3.c:
     # Makefile installs LICENSE into /usr/share/sdelta3, not into /usr/doc/sdelta
     inreplace 'sdelta3.c', "/usr/doc/sdelta", "#{HOMEBREW_PREFIX}/share/#{name}"
+
     system "make install"
   end
 end
