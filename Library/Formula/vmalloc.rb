@@ -2,13 +2,9 @@ require 'formula'
 require 'download_strategy'
 
 class VmallocDownloadStrategy <CurlDownloadStrategy
-  # downloading from AT&T requires using the following credentials
-  def credentials
-    'I accept www.opensource.org/licenses/cpl:.'
-  end
-
-  # private method of CurlDownloadStrategy, can be overridden if needed.
   def _fetch
+    # downloading from AT&T requires using the following credentials
+    credentials = 'I accept www.opensource.org/licenses/cpl:.'
     curl @url, '--output', @tarball_path, '--user', credentials
   end
 end
