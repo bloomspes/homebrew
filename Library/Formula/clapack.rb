@@ -1,15 +1,16 @@
 require 'formula'
 
 class Clapack <Formula
-  url 'http://www.netlib.org/clapack/clapack-3.1.1.1.tgz'
+  url 'http://www.netlib.org/clapack/clapack-3.2.1.tgz'
   homepage 'http://www.netlib.org/clapack/'
-  md5 'a94e28a0ab6f0454951e7ef9c89b3a38'
+  md5 '040da31f3a7d4fbc9ac376c748d18d1f'
 
   def patches; DATA; end
 
   def install
     # makefiles do not work in parallel mode
     ENV.deparallelize
+    ENV.append 'CFLAGS', "-I$(TOPDIR)/INCLUDE -DNO_BLAS_WRAP"
     cp 'make.inc.example', 'make.inc'
     inreplace "make.inc" do |s|
       s.change_make_var! 'PLAT', '_DARWIN'
@@ -19,9 +20,15 @@ class Clapack <Formula
       s.change_make_var! 'LOADOPTS', ENV['LDFLAGS']
     end
     system "make"
+    system "make cblaswrap"
+    system "make fblaswrap"
     (include + name).install Dir['INCLUDE/*.h']
-    lib.install "lapack_DARWIN.a" => 'liblapack3.a'
-    lib.install "blas_DARWIN.a" => 'libblas.a'
+    (include + name).install Dir['BLAS/WRAP/*.h']
+    lib.install "lapack_DARWIN.a" => 'libclapack.a'
+    lib.install "blas_DARWIN.a" => 'libcblas.a'
+    lib.install "libcblaswr.a"
+    lib.install "libfblaswr.a"
+    lib.install "F2CLIBS/libf2c.a"
   end
 end
 
