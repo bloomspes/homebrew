@@ -10,9 +10,12 @@ class Cdecl <Formula
       s.change_make_var! "CC", ENV.cc
       s.change_make_var! "CFLAGS", "#{ENV.cflags} -DBSD -DUSE_READLINE"
       s.change_make_var! "LIBS", "-lreadline"
+      s.change_make_var! "BINDIR", bin
+      s.change_make_var! "MANDIR", man1
     end
     system "make"
-    bin.install ['cdecl', 'c++decl']
-    man1.install ['cdecl.1', 'c++decl.1']
+    bin.mkdir
+    man1.mkpath
+    system "make install"
   end
 end
