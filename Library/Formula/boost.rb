@@ -10,8 +10,8 @@ class Boost <Formula
 
   def options
     [
-      ['--mpi', 'Build Message Passing Interface library.'],
-      ['--universal', 'Build as a Universal binary.'],
+      ['--with-mpi', "Enables MPI support"],
+      ["--universal", "Build universal binaries."]
     ]
   end
 
@@ -43,16 +43,18 @@ class Boost <Formula
       file.write "using mpi ;\n" if build_mpi?
     end
 
-    system "./bootstrap.sh", "--prefix=#{prefix}", "--libdir=#{lib}"
+    additional_jam_args = []
+    additional_jam_args << "address-model=32_64" << "pch=off" if ARGV.include? "--universal"
+
     # we specify libdir too because the script is apparently broken
-    args = ["--prefix=#{prefix}",
-            "--libdir=#{lib}",
-            "-j#{Hardware.processor_count}",
-            "--layout=tagged",
-            "--user-config=user-config.jam",
-            "threading=multi"]
-    args << "architecture=x86" << "address-model=32_64" if build_universal?
-    args << "install"
-    system "./bjam", *args
+    system "./bootstrap.sh", "--prefix=#{prefix}", "--libdir=#{lib}"
+    system "./bjam", "--prefix=#{prefix}",
+                     "--libdir=#{lib}",
+                     "-j#{Hardware.processor_count}",
+                     "--layout=tagged",
+                     "--user-config=user-config.jam",
+                     "threading=multi",
+                     "install",
+                     *additional_jam_args
   end
 end
