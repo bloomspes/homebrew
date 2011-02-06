@@ -5,7 +5,14 @@ class Gsl <Formula
   homepage 'http://www.gnu.org/software/gsl/'
   md5 'd55e7b141815412a072a3f0e12442042'
 
+  def options
+    [
+      ["--universal", "Build universal binaries."]
+    ]
+  end
+
   def install
+    ENV.universal_binary if ARGV.include? "--universal"
     system "./configure", "--prefix=#{prefix}", "--disable-dependency-tracking"
     system "make" # A GNU tool which doesn't support just make install! Shameful!
     system "make install"

@@ -9,11 +9,13 @@ class Laspack <Formula
 
   def options
     [
-      ['--tests', "Install test executables"]
+      ['--tests', "Install test executables"],
+      ["--universal", "Build universal binaries."]
     ]
   end
 
   def install
+    ENV.universal_binary if ARGV.include? "--universal"
     inreplace Dir['**/makefile'] do |s|
       s.change_make_var! "LIBLOCAL", lib
       s.change_make_var! "INCLOCAL", include

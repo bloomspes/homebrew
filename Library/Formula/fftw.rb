@@ -5,7 +5,14 @@ class Fftw <Formula
   url 'http://www.fftw.org/fftw-3.2.2.tar.gz'
   md5 'b616e5c91218cc778b5aa735fefb61ae'
 
+  def options
+    [
+      ["--universal", "Build universal binaries."]
+    ]
+  end
+
   def install
+    ENV.universal_binary if ARGV.include? "--universal"
     args = ["--enable-shared",
             "--disable-debug",
             "--prefix=#{prefix}",
