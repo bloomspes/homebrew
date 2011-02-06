@@ -18,6 +18,7 @@ class Boost <Formula
   def install
     fails_with_llvm "LLVM-GCC causes errors with dropped arguments to "+
                     "functions when linking with boost"
+    ENV.gcc_4_0_1
 
     # Adjust the name the libs are installed under to include the path to the
     # Homebrew lib directory so executables will work when installed to a
@@ -44,7 +45,7 @@ class Boost <Formula
     end
 
     additional_jam_args = []
-    additional_jam_args << "address-model=32_64" << "pch=off" if ARGV.include? "--universal"
+    additional_jam_args << "architecture=combined" << "address-model=32_64" << "pch=off" if ARGV.include? "--universal"
 
     # we specify libdir too because the script is apparently broken
     system "./bootstrap.sh", "--prefix=#{prefix}", "--libdir=#{lib}"

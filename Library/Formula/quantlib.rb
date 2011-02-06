@@ -8,8 +8,10 @@ class Quantlib <Formula
   depends_on 'boost'
 
   def install
+    ENV.universal_binary if ARGV.include? "--universal"
     system "./configure", "--disable-dependency-tracking",
-                          "--prefix=#{prefix}"
+                          "--prefix=#{prefix}",
+                          "--with-pic"
     system "make install"
   end
 end

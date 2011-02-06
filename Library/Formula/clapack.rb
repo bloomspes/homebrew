@@ -7,15 +7,23 @@ class Clapack <Formula
 
   def patches; DATA; end
 
+  def options
+    [
+      ["--universal", "Build universal binaries."]
+    ]
+  end
+
   def install
     # makefiles do not work in parallel mode
     ENV.deparallelize
+    ENV.universal_binary if ARGV.include? "--universal"
     ENV.append 'CFLAGS', "-I$(TOPDIR)/INCLUDE -DNO_BLAS_WRAP"
     cp 'make.inc.example', 'make.inc'
     inreplace "make.inc" do |s|
       s.change_make_var! 'PLAT', '_DARWIN'
       s.change_make_var! "CC", ENV['CC']
       s.change_make_var! 'CFLAGS', ENV['CFLAGS']
+      s.change_make_var! 'NOOPT', ENV['CFLAGS']
       s.change_make_var! "LOADER", ENV['LD']
       s.change_make_var! 'LOADOPTS', ENV['LDFLAGS']
     end
