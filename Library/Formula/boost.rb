@@ -3,7 +3,7 @@ require 'formula'
 def build_mpi?; ARGV.include? "--mpi"; end
 def build_universal?; ARGV.include? "--universal"; end
 
-class Boost <Formula
+class Boost < Formula
   homepage 'http://www.boost.org'
   url 'http://downloads.sourceforge.net/project/boost/boost/1.46.0/boost_1_46_0.tar.bz2'
   md5 '37b12f1702319b73876b0097982087e0'
