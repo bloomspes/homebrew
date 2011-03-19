@@ -1,10 +1,10 @@
 require 'formula'
 
 class Alglib <Formula
-  url 'http://www.alglib.net/translator/re/alglib-3.1.0.cpp.tgz'
+  url 'http://www.alglib.net/translator/re/alglib-3.3.0.cpp.tgz'
   homepage 'http://www.alglib.net'
-  md5 '7ae99397de52aaa21970ff110936fc6c'
-  version '3.1.0'
+  md5 'bfee481739a76f5460d9a88b1c0a5512'
+  version '3.3.0'
 
   def install
     ENV.fast
