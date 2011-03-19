@@ -1,7 +1,5 @@
 require 'formula'
 
-def build_tests?; ARGV.include? "--tests"; end
-
 class Laspack <Formula
   url 'http://www.cerfacs.fr/~douglas/mgnet/Codes/laspack/laspack-1.12.2.tgz'
   homepage 'http://www.mgnet.org/mgnet/Codes/laspack/html/laspack.html'
@@ -9,7 +7,7 @@ class Laspack <Formula
 
   def options
     [
-      ['--tests', "Install test executables"],
+      ['--tests', "Install test executables."],
       ["--universal", "Build universal binaries."]
     ]
   end
