@@ -1,3 +1,5 @@
+require 'pathname'
+
 class Tty
   class <<self
     def blue; bold 34; end
@@ -208,6 +210,11 @@ def nostdout
 end
 
 module MacOS extend self
+
+  def default_cc
+    Pathname.new("/usr/bin/cc").realpath.basename.to_s
+  end
+
   def gcc_42_build_version
     `/usr/bin/gcc-4.2 -v 2>&1` =~ /build (\d{4,})/
     if $1
@@ -293,6 +300,10 @@ module MacOS extend self
     end
 
     false
+  end
+
+  def prefer_64_bit?
+    MACOS_VERSION >= 10.6 and Hardware.is_64_bit?
   end
 end
 
