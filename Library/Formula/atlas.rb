@@ -10,8 +10,15 @@ class Atlas <Formula
     DATA
   end
 
+  def options
+    [
+      ["--universal", "Build universal binaries."]
+    ]
+  end
+
   def install
     ENV.deparallelize
+    ENV.universal_binary if ARGV.include? "--universal"
     mkdir "build"
     cd "build" do
       system "../configure", "--prefix=#{prefix}", "--nof77",
