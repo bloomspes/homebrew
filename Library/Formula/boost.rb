@@ -12,8 +12,9 @@ class Boost < Formula
 
   def options
     [
-      ['--with-mpi', "Enables MPI support"],
-      ["--universal", "Build universal binaries."]
+      ["--with-mpi", "Enable MPI support"],
+      ["--universal", "Build universal binaries"],
+      ["--without-python", "Build without Python"]
     ]
   end
 
@@ -24,7 +25,7 @@ class Boost < Formula
   end
 
   def install
-    if ARGV.build_universal?
+    if ARGV.build_universal? and not ARGV.include? "--without-python"
       archs = archs_for_command("python")
       unless archs.universal?
         opoo "A universal build was requested, but Python is not a universal build"
@@ -66,6 +67,7 @@ class Boost < Formula
             "install"]
 
     args << "address-model=32_64" << "architecture=x86" << "pch=off" if ARGV.include? "--universal"
+    args << "--without-libraries=python" if ARGV.include? "--without-python"
 
     # we specify libdir too because the script is apparently broken
     system "./bootstrap.sh", "--prefix=#{prefix}", "--libdir=#{lib}"
