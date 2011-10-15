@@ -60,7 +60,7 @@ class Boost < Formula
 
     args = ["--prefix=#{prefix}",
             "--libdir=#{lib}",
-            "-j#{Hardware.processor_count}",
+            "-j#{ENV.make_jobs}",
             "--layout=tagged",
             "--user-config=user-config.jam",
             "threading=multi",
