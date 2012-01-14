@@ -1,7 +1,10 @@
 require 'formula'
 
-def build_mpi?; ARGV.include? "--mpi"; end
-def build_universal?; ARGV.include? "--universal"; end
+class BoostLog < Formula
+  url 'http://sourceforge.net/projects/boost-log/files/boost-log-1.1.zip'
+  homepage 'http://http://boost-log.sourceforge.net/'
+  md5 'd42fc71d0ead0d413b997c0e678722ca'
+end
 
 class Boost < Formula
   homepage 'http://www.boost.org'
@@ -29,7 +32,8 @@ class Boost < Formula
     [
       ["--with-mpi", "Enable MPI support"],
       ["--universal", "Build universal binaries"],
-      ["--without-python", "Build without Python"]
+      ["--without-python", "Build without Python"],
+      ["--with-log", "Build with provisionally accepted logging library"]
     ]
   end
 
@@ -40,6 +44,15 @@ class Boost < Formula
   end
 
   def install
+
+    if ARGV.include? "--with-log"
+      d = Dir.getwd
+      BoostLog.new.brew do
+        mv "boost/log", "#{d}/boost/"
+        mv "libs/log", "#{d}/libs/"
+      end
+    end
+
     if ARGV.build_universal? and not ARGV.include? "--without-python"
       archs = archs_for_command("python")
       unless archs.universal?
@@ -70,7 +83,7 @@ class Boost < Formula
     # Force boost to compile using the appropriate GCC version
     open("user-config.jam", "a") do |file|
       file.write "using darwin : : #{ENV['CXX']} ;\n"
-      file.write "using mpi ;\n" if build_mpi?
+      file.write "using mpi ;\n" if ARGV.include? '--with-mpi'
     end
 
     args = ["--prefix=#{prefix}",
@@ -149,4 +162,3 @@ Index: /boost/foreach.hpp
 -inline boost::foreach::is_noncopyable<T> *
 +inline boost::BOOST_FOREACH::is_noncopyable<T> *
  boost_foreach_is_noncopyable(T *&, BOOST_FOREACH_TAG_DEFAULT) { return 0; }
-
