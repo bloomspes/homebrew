@@ -33,6 +33,7 @@ class Boost < Formula
       ["--universal", "Build universal binaries"],
       ["--without-python", "Build without Python"],
       ["--with-icu", "Build regexp engine with icu support"],
+      ["--with-log", "Build with provisionally accepted logging library"]
     ]
   end
 
@@ -46,21 +47,6 @@ class Boost < Formula
     # has not been declared" on its line if it appears after #include
     # <boost/foreach.hpp> and before certain other boost headers.
     DATA unless ARGV.build_head?
-  end
-
-  def options
-    [
-      ["--with-mpi", "Enable MPI support"],
-      ["--universal", "Build universal binaries"],
-      ["--without-python", "Build without Python"],
-      ["--with-log", "Build with provisionally accepted logging library"]
-    ]
-  end
-
-  # Both clang and llvm-gcc provided by XCode 4.1 compile Boost 1.47.0 properly.
-  # Moreover, Apple LLVM compiler 2.1 is now among primary test compilers.
-  if MacOS.xcode_version < "4.1"
-    fails_with_llvm "LLVM-GCC causes errors with dropped arguments to functions when linking with boost"
   end
 
   def install
