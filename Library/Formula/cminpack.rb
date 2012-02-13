@@ -1,13 +1,20 @@
 require 'formula'
 
 class Cminpack < Formula
-  url 'http://devernay.free.fr/hacks/cminpack/cminpack-1.1.3.tar.gz'
+  url 'http://devernay.free.fr/hacks/cminpack/cminpack-1.1.4.tar.gz'
   homepage 'http://devernay.free.fr/hacks/cminpack/cminpack.html'
-  md5 '3573b33d498cc1bf3787a86efbd12c3a'
+  md5 '51edbe65a70f1b7f5b039152981b01aa'
 
   depends_on 'cmake' => :build
 
+  def options
+    [
+      ["--universal", "Build universal binaries."]
+    ]
+  end
+
   def install
+    ENV.universal_binary if ARGV.include? "--universal"
     system "cmake . #{std_cmake_parameters}"
     system "make install"
   end
