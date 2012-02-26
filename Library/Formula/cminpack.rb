@@ -15,7 +15,7 @@ class Cminpack < Formula
 
   def install
     ENV.universal_binary if ARGV.include? "--universal"
-    system "cmake . #{std_cmake_parameters}"
+    system "cmake #{std_cmake_parameters} ."
     system "make install"
   end
 end
