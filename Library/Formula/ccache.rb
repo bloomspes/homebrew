@@ -1,9 +1,9 @@
 require 'formula'
 
 class Ccache < Formula
-  url 'http://samba.org/ftp/ccache/ccache-3.1.6.tar.bz2'
+  url 'http://samba.org/ftp/ccache/ccache-3.1.7.tar.bz2'
   homepage 'http://ccache.samba.org/'
-  md5 '343dc9b642e1d2af1e6bd8e474dde92e'
+  md5 '82257745eac54826527946e9e3d046f4'
 
   def install
     system "./configure", "--prefix=#{prefix}", "--mandir=#{man}"
@@ -23,6 +23,7 @@ class Ccache < Formula
       gcc gcc2 gcc3 gcc-3.3 gcc-4.0 gcc-4.2
       c++ c++3 c++-3.3 c++-4.0 c++-4.2
       g++ g++2 g++3 g++-3.3 g++-4.0 g++-4.2
+      clang clang++
     ].each do |prog|
       ln_s bin+"ccache", libexec + prog
     end
