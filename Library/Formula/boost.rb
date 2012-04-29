@@ -63,15 +63,6 @@ class Boost < Formula
       end
     end
 
-    if ARGV.build_universal? and not ARGV.include? "--without-python"
-      archs = archs_for_command("python")
-      unless archs.universal?
-        opoo "A universal build was requested, but Python is not a universal build"
-        puts "Boost compiles against the Python it finds in the path; if this Python"
-        puts "is not a universal build then linking will likely fail."
-      end
-    end
-
     # Adjust the name the libs are installed under to include the path to the
     # Homebrew lib directory so executables will work when installed to a
     # non-/usr/local location.
