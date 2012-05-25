@@ -30,6 +30,8 @@ class Clapack <Formula
     system "make"
     system "make cblaswrap"
     system "make fblaswrap"
+    # fix permissions for installation
+    chmod_R 0644, Dir['**/*.h']
     (include + name).install Dir['INCLUDE/*.h']
     (include + name).install Dir['BLAS/WRAP/*.h']
     lib.install "lapack_DARWIN.a" => 'libclapack.a'
