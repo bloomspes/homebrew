@@ -8,6 +8,7 @@ class Cudpp < Formula
   depends_on 'cmake' => :build
 
   def install
+    ENV.llvm
     system "cmake . #{std_cmake_parameters}"
     system "make install"
   end
