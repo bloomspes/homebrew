@@ -17,7 +17,7 @@ class Pugixml < Formula
     ENV.universal_binary if ARGV.include? "--universal"
     chdir 'scripts'
     system "cmake", ".", *std_cmake_args
-    system "make install" # if this fails, try separate make/make install steps
+    system "make install"
   end
 
 end
