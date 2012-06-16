@@ -1,7 +1,7 @@
 require 'formula'
 
 class Matio < Formula
-  homepage ''
+  homepage 'http://matio.sourceforge.net/'
   url 'http://downloads.sourceforge.net/project/matio/matio/1.5.0/matio-1.5.0.tar.gz'
   sha1 '70dbf09984ade6adfb38c1b62ae5585ff7f85e05'
 
