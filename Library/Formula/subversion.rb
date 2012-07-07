@@ -5,6 +5,7 @@ def build_perl?;   ARGV.include? "--perl";   end
 def build_python?; ARGV.include? "--python"; end
 def build_ruby?;   ARGV.include? "--ruby";   end
 def with_unicode_path?; ARGV.include? "--unicode-path"; end
+def with_tools?;   ARGV.include? "--tools"; end
 
 class UniversalNeon < Requirement
   def message; <<-EOS.undent
@@ -85,6 +86,7 @@ class Subversion < Formula
       ['--ruby', 'Build Ruby bindings.'],
       ['--universal', 'Build as a Universal Intel binary.'],
       ['--unicode-path', 'Include support for OS X UTF-8-MAC filename'],
+      ['--tools', 'Install extra client-side and server-side tools']
     ]
   end
 
@@ -146,6 +148,22 @@ class Subversion < Formula
     system "make"
     system "make install"
 
+    if with_tools?
+      (prefix+'etc/bash_completion.d').install 'tools/client-side/bash_completion' => 'svn-completion.bash'
+
+      bin.install 'tools/client-side/change-svn-wc-format.py' => 'svn-change-wc-format.py'
+      bin.install 'tools/client-side/server-version.py' => 'svn-server-version.py'
+      bin.install 'tools/client-side/showchange.pl' => 'svn-showchange.pl'
+      bin.install 'tools/client-side/svn-graph.pl'
+      bin.install 'tools/client-side/svn-ssl-fingerprints.sh'
+      bin.install 'tools/client-side/svn-viewspec.py'
+      bin.install 'tools/client-side/wcfind'  => 'svn-wcfind'
+
+      bin.install 'tools/server-side/fsfs-reshard.py' => 'svn-fsfs-reshard.py'
+      bin.install 'tools/server-side/svn_server_log_parse.py' => 'svn-server-log-parse.py'
+      bin.install 'tools/server-side/svn-backup-dumps.py'
+    end
+
     if build_python?
       system "make swig-py"
       system "make install-swig-py"
@@ -190,6 +208,14 @@ class Subversion < Formula
 
   def caveats
     s = ""
+
+    if with_tools?
+      s += <<-EOS.undent
+        Bash completion has been installed to:
+          #{etc}/bash_completion.d
+
+      EOS
+    end
 
     if build_python?
       s += <<-EOS.undent
