@@ -78,6 +78,9 @@ class Subversion < Formula
     depends_on UniversalSerf.new
   end
 
+  # Building Ruby bindings requires libtool
+  depends_on 'libtool' if build_ruby? and MacOS.xcode_version >= "4.3"
+
   def options
     [
       ['--java', 'Build Java bindings.'],
