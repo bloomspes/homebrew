@@ -17,6 +17,8 @@ class ModSuexec < Formula
     rescue # This should never happen, unless Apple drops support for suexec in the future...
       abort "Could not determine suexec path. Are you sure that Apache has been compiled with suexec support?"
     end
+    # set LTFLAGS to work around libtool error "unable to infer tagged configuration"
+    ENV['LTFLAGS'] = "--tag=CC"
     system "./configure",
       "--enable-suexec=shared",
       "--with-suexec-bin=#{suexecbin}",
