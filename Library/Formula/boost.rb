@@ -39,6 +39,7 @@ class Boost < Formula
   option 'with-mpi', 'Enable MPI support'
   option 'without-python', 'Build without Python'
   option 'with-icu', 'Build regexp engine with icu support'
+  option 'with-log', 'Build with provisionally accepted logging library'
 
   depends_on UniversalPython.new if needs_universal_python?
   depends_on "icu4c" if build.include? "--with-icu"
@@ -48,19 +49,9 @@ class Boost < Formula
     cause "Dropped arguments to functions when linking with boost"
   end
 
-  def options
-    [
-      ["--with-mpi", "Enable MPI support"],
-      ["--universal", "Build universal binaries"],
-      ["--without-python", "Build without Python"],
-      ["--with-icu", "Build regexp engine with icu support"],
-      ["--with-log", "Build with provisionally accepted logging library"]
-    ]
-  end
-
   def install
 
-    if ARGV.include? "--with-log"
+    if build.include? "--with-log"
       d = Dir.getwd
       BoostLog.new.brew do
         mv "boost/log", "#{d}/boost/"
