@@ -52,7 +52,7 @@ class Boost < Formula
 
   def install
 
-    if build.include? "--with-log"
+    if build.include? "with-log"
       d = Dir.getwd
       BoostLog.new.brew do
         mv "boost/log", "#{d}/boost/"
