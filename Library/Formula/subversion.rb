@@ -162,8 +162,6 @@ class Subversion < Formula
     (prefix+'etc/bash_completion.d').install 'tools/client-side/bash_completion' => 'subversion'
 
     if with_tools?
-      (prefix+'etc/bash_completion.d').install 'tools/client-side/bash_completion' => 'svn-completion.bash'
-
       bin.install 'tools/client-side/change-svn-wc-format.py' => 'svn-change-wc-format.py'
       bin.install 'tools/client-side/server-version.py' => 'svn-server-version.py'
       bin.install 'tools/client-side/showchange.pl' => 'svn-showchange.pl'
