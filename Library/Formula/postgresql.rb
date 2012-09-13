@@ -2,8 +2,8 @@ require 'formula'
 
 class Postgresql < Formula
   homepage 'http://www.postgresql.org/'
-  url 'http://ftp.postgresql.org/pub/source/v9.1.5/postgresql-9.1.5.tar.bz2'
-  sha1 '8411f39e7cff8d691d908de7823b72426433faa2'
+  url 'http://ftp.postgresql.org/pub/source/v9.2.0/postgresql-9.2.0.tar.bz2'
+  sha1 '6ab154052dd62bb9b0cf2cd666384f7b25eefaf5'
 
   depends_on 'readline'
   depends_on 'libxml2' if MacOS.version == :leopard # Leopard libxml is too old
@@ -14,8 +14,6 @@ class Postgresql < Formula
   option 'no-python', 'Build without Python support'
   option 'no-perl', 'Build without Perl support'
   option 'enable-dtrace', 'Build with DTrace support'
-
-  skip_clean :all
 
   # Fix PL/Python build: https://github.com/mxcl/homebrew/issues/11162
   # Fix uuid-ossp build issues: http://archives.postgresql.org/pgsql-general/2012-07/msg00654.php
@@ -59,9 +57,6 @@ class Postgresql < Formula
       ENV.append 'LDFLAGS', '-arch i386'
     end
 
-    # Fails on Core Duo with O4 and O3
-    ENV.O2 if Hardware.intel_family == :core
-
     system "./configure", *args
     system "make install-world"
   end
@@ -102,15 +97,15 @@ you may need to remove the previous version first. See:
 To build plpython against a specific Python, set PYTHON prior to brewing:
   PYTHON=/usr/local/bin/python  brew install postgresql
 See:
-  http://www.postgresql.org/docs/9.1/static/install-procedure.html
+  http://www.postgresql.org/docs/9.2/static/install-procedure.html
 
 # Create/Upgrade a Database
 
 If this is your first install, create a database with:
   initdb #{var}/postgres -E utf8
 
-To migrate existing data from a previous major version (pre-9.1) of PostgreSQL, see:
-  http://www.postgresql.org/docs/9.1/static/upgrading.html
+To migrate existing data from a previous major version (pre-9.2) of PostgreSQL, see:
+  http://www.postgresql.org/docs/9.2/static/upgrading.html
 
 # Start/Stop PostgreSQL
 
@@ -143,14 +138,14 @@ For instance, to load the tablefunc extension in the current database, run:
   CREATE EXTENSION tablefunc;
 
 For more information on the CREATE EXTENSION command, see:
-  http://www.postgresql.org/docs/9.1/static/sql-createextension.html
+  http://www.postgresql.org/docs/9.2/static/sql-createextension.html
 For more information on extensions, see:
-  http://www.postgresql.org/docs/9.1/static/contrib.html
+  http://www.postgresql.org/docs/9.2/static/contrib.html
 
 # Other
 
 Some machines may require provisioning of shared memory:
-  http://www.postgresql.org/docs/current/static/kernel-resources.html#SYSVIPC
+  http://www.postgresql.org/docs/9.2/static/kernel-resources.html#SYSVIPC
 EOS
 
     if MacOS.prefer_64_bit? then
