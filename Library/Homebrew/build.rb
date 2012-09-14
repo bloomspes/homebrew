@@ -76,8 +76,8 @@ end
 
 def pre_superenv_hacks f
   # fontforge needs 10.7 SDK, wine 32 bit, graphviz has mysteriously missing symbols
-  # and ruby/python etc. create gem/pip that then won't work
-  stdenvs = %w{fontforge python python3 ruby ruby-enterprise-edition jruby wine graphviz}
+  # and ruby/python/ghc etc. create gem/pip that then won't work
+  stdenvs = %w{fontforge python python3 ruby ruby-enterprise-edition jruby wine graphviz ghc}
   ARGV.unshift '--env=std' if (stdenvs.include?(f.name) or
     f.recursive_deps.detect{|d| d.name == 'scons' }) and
     not ARGV.include? '--env=super'
@@ -145,14 +145,6 @@ def install f
     else
       f.prefix.mkpath
       f.install
-
-      # Install a plist if one is defined
-      unless f.startup_plist.nil?
-        unless f.plist_path.exist?
-          f.plist_path.write f.startup_plist
-          f.plist_path.chmod 0644
-        end
-      end
 
       # Find and link metafiles
       FORMULA_META_FILES.each do |filename|
