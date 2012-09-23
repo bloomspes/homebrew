@@ -34,11 +34,11 @@ class Clapack <Formula
     chmod_R 0644, Dir['**/*.h']
     (include + name).install Dir['INCLUDE/*.h']
     (include + name).install Dir['BLAS/WRAP/*.h']
-    lib.install "lapack_DARWIN.a" => 'libclapack.a'
-    lib.install "blas_DARWIN.a" => 'libcblas.a'
-    lib.install "libcblaswr.a"
-    lib.install "libfblaswr.a"
-    lib.install "F2CLIBS/libf2c.a"
+    (lib + name).install "lapack_DARWIN.a" => 'liblapack.a'
+    (lib + name).install "blas_DARWIN.a" => 'libblas.a'
+    (lib + name).install "libcblaswr.a"
+    (lib + name).install "libfblaswr.a"
+    (lib + name).install "F2CLIBS/libf2c.a"
   end
 end
 
