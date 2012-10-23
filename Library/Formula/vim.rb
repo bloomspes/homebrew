@@ -4,12 +4,12 @@ class Vim < Formula
   homepage 'http://www.vim.org/'
   # Get stable versions from hg repo instead of downloading an increasing
   # number of separate patches.
-  url 'https://vim.googlecode.com/hg/', :tag => 'v7-3-693'
-  version '7.3.693'
+  url 'https://vim.googlecode.com/hg/', :tag => 'v7-3-709'
+  version '7.3.709'
 
   head 'https://vim.googlecode.com/hg/'
 
-  env :userpaths # To find interpreters
+  env :std # To find interpreters
 
   def install
     # Why are we specifying HOMEBREW_PREFIX as the prefix?
