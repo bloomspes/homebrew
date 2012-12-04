@@ -2,8 +2,8 @@ require 'formula'
 
 class Redis < Formula
   homepage 'http://redis.io/'
-  url 'http://redis.googlecode.com/files/redis-2.6.6.tar.gz'
-  sha1 'cef5e9e5c9e91b789b06bcb2d9132f76dd581933'
+  url 'http://redis.googlecode.com/files/redis-2.6.7.tar.gz'
+  sha1 'fd7fcbec29956ec01710350b49653a2eda72fbd3'
 
   head 'https://github.com/antirez/redis.git', :branch => 'unstable'
 
@@ -31,7 +31,7 @@ class Redis < Formula
     end
 
     # Fix redis upgrade from 2.4 to 2.6.
-    if File.exists?(etc/'redis.conf') && File.readlines(etc/'redis.conf').grep(/^vm-enabled/)
+    if File.exists?(etc/'redis.conf') && !File.readlines(etc/'redis.conf').grep(/^vm-enabled/).empty?
       mv etc/'redis.conf', etc/'redis.conf.old'
       ohai "Your redis.conf will not work with 2.6; moved it to redis.conf.old"
     end
