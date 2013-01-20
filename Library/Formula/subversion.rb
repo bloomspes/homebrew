@@ -8,14 +8,12 @@ def with_unicode_path?; build.include? "unicode-path"; end
 def with_tools?;   ARGV.include? "tools"; end
 
 class UniversalNeon < Requirement
+  fatal true
+
   def message; <<-EOS.undent
       A universal build was requested, but neon was already built for a single arch.
       You will need to `brew rm neon` first.
     EOS
-  end
-
-  def fatal?
-    true
   end
 
   def satisfied?
@@ -25,14 +23,12 @@ class UniversalNeon < Requirement
 end
 
 class UniversalSqlite < Requirement
+  fatal true
+
   def message; <<-EOS.undent
       A universal build was requested, but sqlite was already built for a single arch.
       You will need to `brew rm sqlite` first.
     EOS
-  end
-
-  def fatal?
-    true
   end
 
   def satisfied?
@@ -42,14 +38,12 @@ class UniversalSqlite < Requirement
 end
 
 class UniversalSerf < Requirement
+  fatal true
+
   def message; <<-EOS.undent
       A universal build was requested, but serf was already built for a single arch.
       You will need to `brew rm serf` first.
     EOS
-  end
-
-  def fatal?
-    true
   end
 
   def satisfied?
