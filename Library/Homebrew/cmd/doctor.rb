@@ -225,7 +225,7 @@ def check_for_latest_xcode
         EOS
       elsif not MacOS::CLT.latest_version?
         <<-EOS.undent
-        A newer Command Line Tools for Xcode release is avaliable
+        A newer Command Line Tools for Xcode release is available
         You should install the latest version from: http://connect.apple.com
         EOS
       end
@@ -746,7 +746,7 @@ def check_for_git_origin
       Without a correctly configured origin, Homebrew won't update
       properly. You can solve this by adding the Homebrew remote:
         cd #{HOMEBREW_REPOSITORY}
-        git add remote origin https://github.com/mxcl/homebrew.git
+        git remote add origin https://github.com/mxcl/homebrew.git
       EOS
     end
   end
