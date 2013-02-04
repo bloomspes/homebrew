@@ -1,52 +1,67 @@
 require 'formula'
 
-class Distcc < Formula
-  homepage 'http://code.google.com/p/distcc/'
-  url 'http://distcc.googlecode.com/files/distcc-3.2rc1.tar.bz2'
-  sha1 '7564e4a4890ad6ff78ec0de620329b71179361e7'
+class PythonWithoutPPC < Requirement
+  fatal true
+  satisfy { not archs_for_command("python").ppc? }
 
-  depends_on 'pkg-config' => :build
-  depends_on 'popt' => :build
-
-  def patches
-    # configure script does not honor --disable-dependency-tracking
-    # remove -MD flags from gcc invocation to prevent compilation error
-    DATA
+  def message
+    "This software will not compile if your default Python is built with PPC support."
   end
-
-  def install
-    ENV['PYTHON'] = which 'python' # python can be brewed or unbrewed
-    system "./configure", "--prefix=#{prefix}"
-    system "make"
-    system "make install"
-  end
-
 end
 
-__END__
-diff --git a/configure b/configure
-index 5ca8d3a..f239c5c 100755
---- a/configure
-+++ b/configure
-@@ -3928,7 +3928,7 @@ POPT_CFLAGS=""
- PYTHON_CFLAGS=""
- if test x"$GCC" = xyes
- then
--    CFLAGS="$CFLAGS -MD \
-+    CFLAGS="$CFLAGS \
- -W -Wall -Wimplicit \
- -Wshadow -Wpointer-arith -Wcast-align -Wwrite-strings \
- -Waggregate-return -Wstrict-prototypes -Wmissing-prototypes \
-diff --git a/configure.ac b/configure.ac
-index 3218801..a98e960 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -167,7 +167,7 @@ POPT_CFLAGS=""
- PYTHON_CFLAGS=""
- if test x"$GCC" = xyes
- then
--    CFLAGS="$CFLAGS -MD \
-+    CFLAGS="$CFLAGS \
- -W -Wall -Wimplicit \
- -Wshadow -Wpointer-arith -Wcast-align -Wwrite-strings \
- -Waggregate-return -Wstrict-prototypes -Wmissing-prototypes \
+class Distcc < Formula
+  homepage 'http://code.google.com/p/distcc/'
+  url 'http://distcc.googlecode.com/files/distcc-3.2rc1.tar.gz'
+  sha1 '7cd46fe0926a3a859a516274e6ae59fa8ba0262d'
+
+  depends_on PythonWithoutPPC
+
+  def install
+    # Prevent distcc from finding the System Python 2.6
+    ENV['PYTHON'] = which('python')
+    # Make sure python stuff is put into the Cellar.
+    # --root triggers a bug and installs into HOMEBREW_PREFIX/lib/python2.7/site-packages instead of the Cellar.
+    inreplace 'Makefile.in', '--root="$$DESTDIR"', ""
+
+    system "./configure", "--prefix=#{prefix}"
+    system "make install"
+
+    plist_path.write startup_plist
+    plist_path.chmod 0644
+  end
+
+  def startup_plist; <<-EOPLIST.undent
+    <?xml version="1.0" encoding="UTF-8"?>
+    <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+    <plist version="1.0">
+      <dict>
+        <key>Label</key>
+        <string>#{plist_name}</string>
+        <key>RunAtLoad</key>
+        <true/>
+        <key>KeepAlive</key>
+        <true/>
+        <key>ProgramArguments</key>
+        <array>
+            <string>#{HOMEBREW_PREFIX}/bin/distccd</string>
+            <string>--daemon</string>
+            <string>--no-detach</string>
+            <string>--allow=192.168.0.1/24</string>
+        </array>
+        <key>WorkingDirectory</key>
+        <string>#{HOMEBREW_PREFIX}</string>
+      </dict>
+    </plist>
+    EOPLIST
+  end
+
+  def caveats; <<-EOS.undent
+    Use 'brew services start distcc' to start distccd automatically on login.
+    By default, it will allow access to all clients on 192.168.0.1/24.
+    EOS
+  end
+
+  def test
+    system "#{bin}/distcc"
+  end
+end
