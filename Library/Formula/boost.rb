@@ -58,10 +58,6 @@ class Boost < Formula
     cause "Dropped arguments to functions when linking with boost"
   end
 
-  def pour_bottle?
-    false
-  end
-
   def install
 
     if build.include? "with-log"
