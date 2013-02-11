@@ -3,8 +3,8 @@ require 'formula'
 class Objconv <Formula
   url 'http://www.agner.org/optimize/objconv.zip'
   homepage 'http://www.agner.org/optimize/'
-  md5 'c6186a916b97802f7af20ee9d0b7892c'
-  version '2.1.0'
+  sha1 '4c81aca6d9fe3e2664599e633eea4c0ed36431b5'
+  version '2.16'
 
   def install
     ENV.fast
