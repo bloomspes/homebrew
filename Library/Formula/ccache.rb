@@ -22,9 +22,9 @@ class Ccache < Formula
 
     %w[
       cc
-      gcc gcc2 gcc3 gcc-3.3 gcc-4.0 gcc-4.2 gcc-4.7
-      c++ c++3 c++-3.3 c++-4.0 c++-4.2 c++-4.7
-      g++ g++2 g++3 g++-3.3 g++-4.0 g++-4.2 g++-4.7
+      gcc gcc2 gcc3 gcc-3.3 gcc-4.0 gcc-4.2 gcc-4.5 gcc-4.7 gcc-4.8
+      c++ c++3 c++-3.3 c++-4.0 c++-4.2 c++-4.5 c++-4.7 c++-4.8
+      g++ g++2 g++3 g++-3.3 g++-4.0 g++-4.2 g++-4.5 g++-4.7 g++-4.8
       clang clang++
     ].each do |prog|
       ln_s bin+"ccache", libexec + prog
