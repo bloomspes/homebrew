@@ -1,23 +1,6 @@
 require 'testing_env'
 require 'test/testball'
 
-class MockFormula < Formula
-  def initialize url
-    @stable = SoftwareSpec.new(url)
-    super 'test'
-  end
-end
-
-class TestZip < Formula
-  def initialize
-    @homepage = 'http://example.com/'
-    zip=HOMEBREW_CACHE.parent+'test-0.1.zip'
-    Kernel.system '/usr/bin/zip', '-q', '-0', zip, ABS__FILE__
-    @stable = SoftwareSpec.new "file://#{zip}"
-    super 'testzip'
-  end
-end
-
 # All other tests so far -- feel free to break them out into
 # separate TestCase classes.
 
@@ -51,7 +34,18 @@ class BeerTasting < Test::Unit::TestCase
   end
 
   def test_zip
-    shutup { assert_nothing_raised { TestZip.new.brew {} } }
+    zip = HOMEBREW_CACHE.parent + 'test-0.1.zip'
+    Kernel.system '/usr/bin/zip', '-q', '-0', zip, ABS__FILE__
+
+    shutup do
+      assert_nothing_raised do
+        Class.new(Formula) do
+          url "file://#{zip}"
+        end.new("test_zip").brew {}
+      end
+    end
+  ensure
+    zip.unlink if zip.exist?
   end
 
   def test_brew_h
@@ -61,7 +55,12 @@ class BeerTasting < Test::Unit::TestCase
 
     shutup do
       assert_nothing_raised do
-        f=TestBallWithRealPath.new
+        f = Class.new(TestBall) do
+          def initialize(*)
+            super
+            @path = Pathname.new(__FILE__)
+          end
+        end.new
         Homebrew.info_formula f
         Homebrew.prune
         #TODO test diy function too
@@ -72,15 +71,9 @@ class BeerTasting < Test::Unit::TestCase
   def test_brew_cleanup
     require 'cmd/cleanup'
 
-    f1 = TestBall.new
-    f1.instance_eval { @version = Version.new("0.1") }
-    f1.active_spec.instance_eval { @version = Version.new("0.1") }
-    f2 = TestBall.new
-    f2.instance_eval { @version = Version.new("0.2") }
-    f2.active_spec.instance_eval { @version = Version.new("0.2") }
-    f3 = TestBall.new
-    f3.instance_eval { @version = Version.new("0.3") }
-    f3.active_spec.instance_eval { @version = Version.new("0.3") }
+    f1 = Class.new(TestBall) { version '0.1' }.new
+    f2 = Class.new(TestBall) { version '0.2' }.new
+    f3 = Class.new(TestBall) { version '0.3' }.new
 
     shutup do
       f1.brew { f1.install }
@@ -160,11 +153,11 @@ class BeerTasting < Test::Unit::TestCase
     assert_version_equal '0.1', foo1.version
   end
 
-  class MockMockFormula < Struct.new(:name); end
-
   def test_formula_equality
-    f = MockFormula.new('http://example.com/test-0.1.tgz')
-    g = MockMockFormula.new('test')
+    f = Class.new(Formula) do
+      url 'http://example.com/test-0.1.tgz'
+    end.new('test')
+    g = Struct.new(:name).new('test')
 
     assert f == f
     assert f == g
