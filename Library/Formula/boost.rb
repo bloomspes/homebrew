@@ -1,9 +1,9 @@
 require 'formula'
 
 class BoostLog < Formula
-  url 'http://sourceforge.net/projects/boost-log/files/boost-log-2.0-beta1-r800.zip'
+  url 'http://sourceforge.net/projects/boost-log/files/boost-log-2.0-r862.zip'
   homepage 'http://http://boost-log.sourceforge.net/'
-  sha1 '83f97124e3e325a280f43f74a128d8fff0d7c78d'
+  sha1 '58c89734ffc1ebacfdedbd4fa268202e3d8c2d63'
 end
 
 class UniversalPython < Requirement
