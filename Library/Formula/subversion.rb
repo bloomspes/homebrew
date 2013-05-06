@@ -106,7 +106,7 @@ class Subversion < Formula
     system "./configure", *args
     system "make"
     system "make install"
-    (prefix+'etc/bash_completion.d').install 'tools/client-side/bash_completion' => 'subversion'
+    bash_completion.install 'tools/client-side/bash_completion' => 'subversion'
 
     if build.include? 'tools'
       bin.install 'tools/client-side/change-svn-wc-format.py' => 'svn-change-wc-format.py'
