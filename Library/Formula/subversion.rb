@@ -8,7 +8,6 @@ class Subversion < Formula
   option :universal
   option 'java', 'Build Java bindings'
   option 'perl', 'Build Perl bindings'
-  option 'python', 'Build Python bindings'
   option 'ruby', 'Build Ruby bindings'
   option 'unicode-path', 'Include support for OS X UTF-8-MAC filename'
   option 'tools', 'Install extra client-side and server-side tools'
@@ -19,12 +18,13 @@ class Subversion < Formula
   depends_on 'neon'
   depends_on 'sqlite'
   depends_on 'serf'
+  depends_on :python => :optional
 
   # Building Ruby bindings requires libtool
   depends_on :libtool if build.include? 'ruby'
 
   # If building bindings, allow non-system interpreters
-  env :userpaths if (build.include? 'perl') or (build.include? 'python') or (build.include? 'ruby')
+  env :userpaths if (build.include? 'perl') or (build.include? 'ruby')
 
   def patches
     ps = []
@@ -44,13 +44,13 @@ class Subversion < Formula
     end
   end
 
-  # When building Perl, Python or Ruby bindings, need to use a compiler that
+  # When building Perl or Ruby bindings, need to use a compiler that
   # recognizes GCC-style switches, since that's what the system languages
   # were compiled against.
   fails_with :clang do
     build 318
     cause "core.c:1: error: bad value (native) for -march= switch"
-  end if (build.include? 'perl') or (build.include? 'python') or (build.include? 'ruby')
+  end if (build.include? 'perl') or (build.include? 'ruby')
 
   def apr_bin
     superbin or "/usr/bin"
@@ -123,7 +123,7 @@ class Subversion < Formula
       bin.install 'tools/server-side/svn-backup-dumps.py'
     end
 
-    if build.include? 'python'
+    python do
       system "make swig-py"
       system "make install-swig-py"
     end
@@ -174,13 +174,7 @@ class Subversion < Formula
       EOS
     end
 
-    if build.include? 'python'
-      s += <<-EOS.undent
-        You may need to add the Python bindings to your PYTHONPATH from:
-          #{HOMEBREW_PREFIX}/lib/svn-python
-
-      EOS
-    end
+    s += python.standard_caveats if python
 
     if build.include? 'perl'
       s += <<-EOS.undent
@@ -227,9 +221,9 @@ __END__
 --- subversion/bindings/swig/perl/native/Makefile.PL.in~	2011-07-16 04:47:59.000000000 -0700
 +++ subversion/bindings/swig/perl/native/Makefile.PL.in	2012-06-27 17:45:57.000000000 -0700
 @@ -57,10 +57,13 @@
- 
+
  chomp $apr_shlib_path_var;
- 
+
 +my $config_ccflags = $Config{ccflags};
 +$config_ccflags =~ s/-arch\s+\S+//g; # remove any -arch arguments, since the ones we want will already be in $cflags
 +
