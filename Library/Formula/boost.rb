@@ -50,6 +50,12 @@ class Boost < Formula
     cause "Dropped arguments to functions when linking with boost"
   end
 
+  def pour_bottle?
+    # Don't use the bottle if there is a Homebrew python installed as users
+    # will probably want to link against that instead.
+    not Formula.factory('python').installed?
+  end
+
   def install
 
     if build.include? "with-log"
