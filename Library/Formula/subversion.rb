@@ -123,6 +123,18 @@ class Subversion < Formula
       bin.install 'tools/server-side/svn-backup-dumps.py'
     end
 
+    system "make tools"
+    system "make install-tools"
+    %w[
+      svn-populate-node-origins-index
+      svn-rep-sharing-stats
+      svnauthz-validate
+      svnmucc
+      svnraisetreeconflict
+    ].each do |prog|
+      bin.install_symlink bin/"svn-tools"/prog
+    end
+
     python do
       system "make swig-py"
       system "make install-swig-py"
