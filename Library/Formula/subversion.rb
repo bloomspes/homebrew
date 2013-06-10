@@ -103,20 +103,6 @@ class Subversion < Formula
     system "make install"
     bash_completion.install 'tools/client-side/bash_completion' => 'subversion'
 
-    if build.include? 'tools'
-      bin.install 'tools/client-side/change-svn-wc-format.py' => 'svn-change-wc-format.py'
-      bin.install 'tools/client-side/server-version.py' => 'svn-server-version.py'
-      bin.install 'tools/client-side/showchange.pl' => 'svn-showchange.pl'
-      bin.install 'tools/client-side/svn-graph.pl'
-      bin.install 'tools/client-side/svn-ssl-fingerprints.sh'
-      bin.install 'tools/client-side/svn-viewspec.py'
-      bin.install 'tools/client-side/wcfind'  => 'svn-wcfind'
-
-      bin.install 'tools/server-side/fsfs-reshard.py' => 'svn-fsfs-reshard.py'
-      bin.install 'tools/server-side/svn_server_log_parse.py' => 'svn-server-log-parse.py'
-      bin.install 'tools/server-side/svn-backup-dumps.py'
-    end
-
     system "make tools"
     system "make install-tools"
     %w[
@@ -132,6 +118,19 @@ class Subversion < Formula
     python do
       system "make swig-py"
       system "make install-swig-py"
+    end
+
+    if build.include? 'tools'
+      bin.install 'tools/client-side/change-svn-wc-format.py' => 'svn-change-wc-format.py'
+      bin.install 'tools/client-side/server-version.py' => 'svn-server-version.py'
+      bin.install 'tools/client-side/showchange.pl' => 'svn-showchange.pl'
+      bin.install 'tools/client-side/svn-graph.pl'
+      bin.install 'tools/client-side/svn-ssl-fingerprints.sh'
+      bin.install 'tools/client-side/svn-viewspec.py'
+      bin.install 'tools/client-side/wcfind'  => 'svn-wcfind'
+      bin.install 'tools/server-side/fsfs-reshard.py' => 'svn-fsfs-reshard.py'
+      bin.install 'tools/server-side/svn_server_log_parse.py' => 'svn-server-log-parse.py'
+      bin.install 'tools/server-side/svn-backup-dumps.py'
     end
 
     if build.include? 'perl'
