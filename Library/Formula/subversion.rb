@@ -2,8 +2,8 @@ require 'formula'
 
 class Subversion < Formula
   homepage 'http://subversion.apache.org/'
-  url 'http://www.apache.org/dyn/closer.cgi?path=subversion/subversion-1.7.10.tar.bz2'
-  sha1 'a4f3de0a13b034b0eab4d35512c6c91a4abcf4f5'
+  url 'http://www.apache.org/dyn/closer.cgi?path=subversion/subversion-1.8.0.tar.bz2'
+  sha1 '45d227511507c5ed99e07f9d42677362c18b364c'
 
   option :universal
   option 'java', 'Build Java bindings'
@@ -15,7 +15,6 @@ class Subversion < Formula
   depends_on 'pkg-config' => :build
 
   # Always build against Homebrew versions instead of system versions for consistency.
-  depends_on 'neon'
   depends_on 'serf'
   depends_on 'sqlite'
   depends_on :python => :optional
@@ -57,11 +56,11 @@ class Subversion < Formula
   end
 
   def install
-    # Java support doesn't build correctly in parallel:
-    # https://github.com/mxcl/homebrew/issues/20415
-    ENV.deparallelize
-
     if build.include? 'java'
+      # Java support doesn't build correctly in parallel:
+      # https://github.com/mxcl/homebrew/issues/20415
+      ENV.deparallelize
+
       unless build.universal?
         opoo "A non-Universal Java build was requested."
         puts "To use Java bindings with various Java IDEs, you might need a universal build:"
@@ -85,7 +84,6 @@ class Subversion < Formula
             "--with-zlib=/usr",
             "--with-sqlite=#{Formula.factory('sqlite').opt_prefix}",
             "--with-serf=#{Formula.factory('serf').opt_prefix}",
-            "--disable-neon-version-check",
             "--disable-mod-activation",
             "--disable-nls",
             "--without-apache-libexecdir",
@@ -114,7 +112,6 @@ class Subversion < Formula
       svn-populate-node-origins-index
       svn-rep-sharing-stats
       svnauthz-validate
-      svnmucc
       svnraisetreeconflict
     ].each do |prog|
       bin.install_symlink bin/"svn-tools"/prog
