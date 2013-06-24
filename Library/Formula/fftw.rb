@@ -7,6 +7,8 @@ class Fftw < Formula
 
   option "with-fortran", "Enable Fortran bindings"
 
+  depends_on :fortran if build.include? "with-fortran"
+
   def install
     ENV.universal_binary if ARGV.include? "--universal"
     args = ["--enable-shared",
@@ -15,11 +17,7 @@ class Fftw < Formula
             "--enable-threads",
             "--disable-dependency-tracking"]
 
-    if build.include? "with-fortran"
-      ENV.fortran
-    else
-      args << "--disable-fortran" unless which 'gfortran'
-    end
+    args << "--disable-fortran" unless build.include? "with-fortran"
 
     # single precision
     # enable-sse only works with single
