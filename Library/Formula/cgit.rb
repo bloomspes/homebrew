@@ -1,15 +1,15 @@
 require 'formula'
 
 class CgitGit < Formula
-  homepage 'http://hjemli.net/git/cgit/'
-  url 'http://hjemli.net/git/git/snapshot/git-1.7.4.tar.bz2'
-  md5 '5a339806884ad222412b0f6c3ad391d8'
+  homepage 'http://git.zx2c4.com/cgit/'
+  url 'http://git.plenz.com/git/snapshot/git-1.7.3.5.tar.gz'
+  sha1 '6e556483ff409241edd793cf79d9052e1f8f1c57'
 end
 
 class Cgit < Formula
-  homepage 'http://hjemli.net/git/cgit/'
-  url 'http://hjemli.net/git/cgit/snapshot/cgit-0.9.0.3.tar.bz2'
-  sha1 '75696f21c6a8e249f4b59ccff99116ed602966c3'
+  homepage 'http://git.zx2c4.com/cgit/'
+  url 'http://git.zx2c4.com/cgit/snapshot/cgit-0.9.0.3.zip'
+  sha1 '744903be9985c1fceefdb221795d945fdb6c6d4d'
 
   def patches
     # Fix libiconv dependency on Darwin
@@ -76,36 +76,36 @@ index 6de072a..078c1d4 100644
 +++ b/Makefile
 @@ -88,7 +88,7 @@ endif
  	$(QUIET_CC)$(CC) -o $*.o -c $(CFLAGS) $<
- 
- 
+
+
 -EXTLIBS = git/libgit.a git/xdiff/lib.a -lz -lpthread
 +EXTLIBS = git/libgit.a git/xdiff/lib.a -lz -lpthread -liconv
  OBJECTS =
  OBJECTS += cache.o
  OBJECTS += cgit.o
 @@ -163,7 +163,7 @@ cgit: $(OBJECTS) libgit
- 
+
  cgit.o: VERSION
- 
+
 -ifneq "$(MAKECMDGOALS)" "clean"
 +ifneq "$(MAKECMDGOALS)" "get-git"
    -include $(OBJECTS:.o=.d)
  endif
- 
+
 @@ -226,13 +226,13 @@ doc-html: $(DOC_HTML)
  doc-pdf: $(DOC_PDF)
- 
+
  %.5 : %.5.txt
 -	a2x -f manpage $<
 +	a2x -L -f manpage $<
- 
+
  $(DOC_HTML): %.html : %.txt
 -	a2x -f xhtml --stylesheet=cgit-doc.css $<
 +	a2x -L -f xhtml --stylesheet=cgit-doc.css $<
- 
+
  $(DOC_PDF): %.pdf : %.txt
 -	a2x -f pdf cgitrc.5.txt
 +	a2x -L -f pdf cgitrc.5.txt
- 
+
  clean: clean-doc
  	rm -f cgit VERSION *.o *.d
