@@ -1,11 +1,5 @@
 require 'formula'
 
-class BoostLog < Formula
-  url 'http://sourceforge.net/projects/boost-log/files/boost-log-2.0-r862.zip'
-  homepage 'http://http://boost-log.sourceforge.net/'
-  sha1 '58c89734ffc1ebacfdedbd4fa268202e3d8c2d63'
-end
-
 class UniversalPython < Requirement
   satisfy(:build_env => false) { archs_for_command("python").universal? }
 
@@ -36,7 +30,6 @@ class Boost < Formula
 
   option :universal
   option 'with-icu', 'Build regexp engine with icu support'
-  option 'with-log', 'Build with provisionally accepted logging library'
   option 'with-c++11', 'Compile using Clang, std=c++11 and stdlib=libc++' if MacOS.version >= :lion
   option 'use-system-layout', 'Use system layout instead of tagged'
 
@@ -67,15 +60,6 @@ class Boost < Formula
   end
 
   def install
-
-    if build.include? "with-log"
-      d = Dir.getwd
-      BoostLog.new.brew do
-        mv "boost/log", "#{d}/boost/"
-        mv "libs/log", "#{d}/libs/"
-      end
-    end
-
     # Adjust the name the libs are installed under to include the path to the
     # Homebrew lib directory so executables will work when installed to a
     # non-/usr/local location.
