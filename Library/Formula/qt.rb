@@ -37,7 +37,7 @@ class Qt < Formula
     # we have to disable these to avoid triggering optimization code
     # that will fail in superenv, perhaps because we rename clang to cc and
     # Qt thinks it can build with special assembler commands.
-    # In --env=std, Qt seems aware of this.)
+    # In --env=std, Qt seems aware of this.
     # But we want superenv, because it allows to build Qt in non-standard
     # locations and with Xcode-only.
     args << "-no-3dnow" << "-no-ssse3" if superenv?
@@ -78,11 +78,16 @@ class Qt < Formula
       args << '-arch' << 'x86'
     end
 
+    # We move the source and build in-place because:
+    # - Debug symbols need to find the source so build in the prefix
+    # - to fix https://github.com/mxcl/homebrew/issues/20020
+    # - PySide `make apidoc` needs the src
+    (prefix/"src").mkdir
+    mv Dir['*'], "#{prefix}/src/"
+    cd "#{prefix}/src"
+
     if build.with? 'debug-and-release'
       args << "-debug-and-release"
-      # Debug symbols need to find the source so build in the prefix
-      mv "../qt-everywhere-opensource-src-#{version}", "#{prefix}/src"
-      cd "#{prefix}/src"
     else
       args << "-release"
     end
@@ -102,7 +107,7 @@ class Qt < Formula
 
     # Some config scripts will only find Qt in a "Frameworks" folder
     frameworks.mkpath
-    ln_s Dir['lib/*.framework'], frameworks
+    ln_s Dir["#{lib}/*.framework"], frameworks
 
     # The pkg-config files installed suggest that headers can be found in the
     # `include` directory. Make this so by creating symlinks from `include` to
