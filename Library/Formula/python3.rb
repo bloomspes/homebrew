@@ -35,6 +35,7 @@ class Python3 < Formula
   depends_on 'openssl' if build.with? 'brewed-openssl'
   depends_on 'xz' => :recommended  # for the lzma module added in 3.3
   depends_on 'homebrew/dupes/tcl-tk' if build.with? 'brewed-tk'
+  depends_on :x11 if build.with? 'brewed-tk' and Tab.for_name('tcl-tk').used_options.include?('with-x11')
 
   def patches
     DATA if build.with? 'brewed-tk'
@@ -157,7 +158,7 @@ class Python3 < Formula
     Pip.new.brew { system py.binary, *setup_args }
     mv bin/'pip', bin/'pip3'
 
-    # And now we write the distuitsl.cfg
+    # And now we write the distutils.cfg
     cfg = prefix/"Frameworks/Python.framework/Versions/#{VER}/lib/python#{VER}/distutils/distutils.cfg"
     cfg.delete if cfg.exist?
     cfg.write <<-EOF.undent

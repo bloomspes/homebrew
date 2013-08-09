@@ -31,6 +31,7 @@ class Python < Formula
   depends_on 'gdbm' => :recommended
   depends_on 'openssl' if build.with? 'brewed-openssl'
   depends_on 'homebrew/dupes/tcl-tk' if build.with? 'brewed-tk'
+  depends_on :x11 if build.with? 'brewed-tk' and Tab.for_name('tcl-tk').used_options.include?('with-x11')
 
   def patches
     p = []
@@ -129,6 +130,8 @@ class Python < Formula
     # We ship setuptools and pip and reuse the PythonInstalled
     # Requirement here to write the sitecustomize.py
     py = PythonInstalled.new("2.7")
+    py.binary = bin/'python'
+    py.modify_build_environment
 
     # Remove old setuptools installations that may still fly around and be
     # listed in the easy_install.pth. This can break setuptools build with
@@ -137,14 +140,12 @@ class Python < Formula
     rm_rf Dir["#{py.global_site_packages}/setuptools*"]
     rm_rf Dir["#{py.global_site_packages}/distribute*"]
 
-    py.binary = bin/'python'
-    py.modify_build_environment
     setup_args = [ "-s", "setup.py", "--no-user-cfg", "install", "--force", "--verbose",
                    "--install-scripts=#{bin}", "--install-lib=#{site_packages}" ]
-    Setuptools.new.brew { system "#{bin}/python2", *setup_args }
-    Pip.new.brew { system "#{bin}/python2", *setup_args }
+    Setuptools.new.brew { system py.binary, *setup_args }
+    Pip.new.brew { system py.binary, *setup_args }
 
-    # And now we write the distuitsl.cfg
+    # And now we write the distutils.cfg
     cfg = prefix/"Frameworks/Python.framework/Versions/2.7/lib/python2.7/distutils/distutils.cfg"
     cfg.delete if cfg.exist?
     cfg.write <<-EOF.undent
