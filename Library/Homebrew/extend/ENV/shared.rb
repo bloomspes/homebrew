@@ -60,6 +60,14 @@ module SharedEnvExtension
     end if value
   end
 
+  def cc= val
+    self['CC'] = self['OBJC'] = val
+  end
+
+  def cxx= val
+    self['CXX'] = self['OBJCXX'] = val
+  end
+
   def cc;       self['CC'];           end
   def cxx;      self['CXX'];          end
   def cflags;   self['CFLAGS'];       end
@@ -112,22 +120,16 @@ module SharedEnvExtension
   end
 
   def fortran
-    # superenv removes these PATHs, but this option needs them
-    # TODO fix better, probably by making a super-fc
-    self['PATH'] += ":#{HOMEBREW_PREFIX}/bin:/usr/local/bin"
+    flags = []
 
-    if self['FC']
+    if fc
       ohai "Building with an alternative Fortran compiler"
       puts "This is unsupported."
-      self['F77'] ||= self['FC']
+      self['F77'] ||= fc
 
       if ARGV.include? '--default-fortran-flags'
-        flags_to_set = []
-        flags_to_set << 'FCFLAGS' unless self['FCFLAGS']
-        flags_to_set << 'FFLAGS' unless self['FFLAGS']
-        flags_to_set.each {|key| self[key] = cflags}
-        set_cpu_flags(flags_to_set)
-      elsif not self['FCFLAGS'] or self['FFLAGS']
+        flags = FC_FLAG_VARS.reject { |key| self[key] }
+      elsif values_at(*FC_FLAG_VARS).compact.empty?
         opoo <<-EOS.undent
           No Fortran optimization information was provided.  You may want to consider
           setting FCFLAGS and FFLAGS or pass the `--default-fortran-flags` option to
@@ -138,14 +140,14 @@ module SharedEnvExtension
         EOS
       end
 
-    elsif which 'gfortran'
+    elsif (gfortran = which('gfortran', ORIGINAL_PATHS.join(File::PATH_SEPARATOR)))
       ohai "Using Homebrew-provided fortran compiler."
       puts "This may be changed by setting the FC environment variable."
-      self['FC'] = which 'gfortran'
-      self['F77'] = self['FC']
-
-      FC_FLAG_VARS.each {|key| self[key] = cflags}
-      set_cpu_flags(FC_FLAG_VARS)
+      self['FC'] = self['F77'] = gfortran
+      flags = FC_FLAG_VARS
     end
+
+    flags.each { |key| self[key] = cflags }
+    set_cpu_flags(flags)
   end
 end
