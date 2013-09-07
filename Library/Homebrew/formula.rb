@@ -308,6 +308,7 @@ class Formula
       -DCMAKE_INSTALL_PREFIX=#{prefix}
       -DCMAKE_BUILD_TYPE=None
       -DCMAKE_FIND_FRAMEWORK=LAST
+      -DCMAKE_VERBOSE_MAKEFILE=ON
       -Wno-dev
     ]
   end
@@ -590,7 +591,7 @@ class Formula
   rescue ErrorDuringExecution
     raise BuildError.new(self, cmd, args, $?)
   ensure
-    f.close if f and not f.closed?
+    [rd, f].each { |io| io.close if io and not io.closed? }
     ENV.update(removed_ENV_variables) if removed_ENV_variables
   end
 
