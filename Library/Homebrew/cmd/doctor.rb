@@ -193,7 +193,7 @@ end
 def check_xcode_clt
   if MacOS::Xcode.installed?
     __check_xcode_up_to_date
-  elsif MacOS.version >= 10.7
+  elsif MacOS.version >= "10.7"
     __check_clt_up_to_date
   else <<-EOS.undent
     Xcode not installed
@@ -225,20 +225,12 @@ def __check_clt_up_to_date
 end
 
 def check_for_osx_gcc_installer
-  if (MacOS.version < 10.7 || MacOS::Xcode.version < "4.1") && \
+  if (MacOS.version < "10.7" || MacOS::Xcode.version < "4.1") && \
     MacOS.clang_version == "2.1" then <<-EOS.undent
     You have osx-gcc-installer installed.
     Homebrew doesn't support osx-gcc-installer, and it is known to cause
     some builds to fail.
     Please install Xcode #{MacOS::Xcode.latest_version}.
-    EOS
-  end
-end
-
-def check_for_unsupported_osx
-  if MacOS.version > 10.8 then <<-EOS.undent
-    You are using Mac OS X #{MacOS.version}.
-    We do not yet provide support for this (unreleased) version.
     EOS
   end
 end
