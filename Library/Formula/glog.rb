@@ -6,6 +6,7 @@ class Glog < Formula
   sha1 'ed40c26ecffc5ad47c618684415799ebaaa30d65'
 
   depends_on 'gflags'
+  depends_on 'gtest'
 
   def patches
     if MacOS.version >= :mavericks

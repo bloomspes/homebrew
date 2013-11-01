@@ -7,9 +7,24 @@ class Quantlib < Formula
 
   depends_on 'boost'
 
+  def options
+    [
+      ["--universal", "Build universal binaries."],
+      ["--with-examples", "Also install examples."],
+      ["--with-benchmark", "Also install benchmark."]
+    ]
+  end
+
   def install
-    system "./configure", "--disable-dependency-tracking",
-                          "--prefix=#{prefix}"
+    ENV.universal_binary if ARGV.include? "--universal"
+    args = ["--disable-dependency-tracking",
+            "--prefix=#{prefix}",
+            "--with-pic"]
+    args << "--enable-examples" if ARGV.include? "--with-examples"
+    args << "--enable-benchmark" if ARGV.include? "--with-benchmark"
+
+    system "./configure", *args
     system "make install"
   end
+
 end

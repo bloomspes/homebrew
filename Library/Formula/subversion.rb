@@ -159,6 +159,19 @@ class Subversion < Formula
       system "make install-swig-py"
     end
 
+    if build.include? 'tools'
+      bin.install 'tools/client-side/change-svn-wc-format.py' => 'svn-change-wc-format.py'
+      bin.install 'tools/client-side/server-version.py' => 'svn-server-version.py'
+      bin.install 'tools/client-side/showchange.pl' => 'svn-showchange.pl'
+      bin.install 'tools/client-side/svn-graph.pl'
+      bin.install 'tools/client-side/svn-ssl-fingerprints.sh'
+      bin.install 'tools/client-side/svn-viewspec.py'
+      bin.install 'tools/client-side/wcfind'  => 'svn-wcfind'
+      bin.install 'tools/server-side/fsfs-reshard.py' => 'svn-fsfs-reshard.py'
+      bin.install 'tools/server-side/svn_server_log_parse.py' => 'svn-server-log-parse.py'
+      bin.install 'tools/server-side/svn-backup-dumps.py'
+    end
+
     if build.include? 'perl'
       # Remove hard-coded ppc target, add appropriate ones
       if build.universal?
@@ -204,6 +217,14 @@ class Subversion < Formula
       svntools have been installed to:
         #{opt_prefix}/libexec
     EOS
+
+    if build.include? 'tools'
+      s += <<-EOS.undent
+        Bash completion has been installed to:
+          #{etc}/bash_completion.d
+
+      EOS
+    end
 
     s += python.standard_caveats if python
 

@@ -10,6 +10,7 @@ class Fftw < Formula
   depends_on :fortran => :optional
 
   def install
+    ENV.universal_binary if ARGV.include? "--universal"
     args = ["--enable-shared",
             "--disable-debug",
             "--prefix=#{prefix}",
