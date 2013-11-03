@@ -102,7 +102,7 @@ class Cmd
     when :ld
       ldflags + args
     end.compact
-    make_fuss(allflags) if verbose?
+    make_fuss(allflags) if verbose? and cccfg? 'O'
     allflags
   end
   def refurbished_args
@@ -242,6 +242,8 @@ class Cmd
 end
 
 if __FILE__ == $PROGRAM_NAME
+  STDOUT.sync = STDERR.sync = true
+
   ##################################################################### sanity
   abort "The build-tool has reset ENV. --env=std required." unless ENV['HOMEBREW_BREW_FILE']
 
