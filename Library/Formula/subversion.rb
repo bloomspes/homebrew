@@ -193,7 +193,7 @@ class Subversion < Formula
       system "make", "install-swig-pl", "DESTDIR=#{prefix}"
       # Some of the libraries get installed into the wrong place, they end up having the
       # prefix in the directory name twice.
-      mv Dir.glob("#{prefix}/#{lib}/*"), "#{lib}"
+      mv Dir["#{prefix}/#{lib}/*"], "#{lib}"
     end
 
     if build.include? 'java'
@@ -216,7 +216,7 @@ class Subversion < Formula
   def caveats
     s = <<-EOS.undent
       svntools have been installed to:
-        #{opt_prefix}/libexec
+        #{opt_libexec}
     EOS
 
     if build.include? 'perl'
