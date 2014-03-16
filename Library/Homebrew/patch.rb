@@ -1,7 +1,6 @@
 require 'resource'
 require 'stringio'
 require 'erb'
-require 'forwardable'
 
 class Patch
   def self.create(strip, io=nil, &block)
@@ -85,23 +84,17 @@ class IOPatch < Patch
 end
 
 class ExternalPatch < Patch
-  extend Forwardable
-
   attr_reader :resource, :strip
-
-  def_delegators :@resource, :fetch, :verify_download_integrity,
-    :cached_download, :clear_cache, :url
 
   def initialize(strip, &block)
     @strip    = strip
-    @resource = Resource.new(&block)
+    @resource = Resource.new("patch", &block)
     @whence   = :resource
   end
 
   def owner= owner
     resource.owner   = owner
-    resource.name    = "patch"
-    resource.version = resource.checksum
+    resource.version = resource.checksum || ERB::Util.url_encode(resource.url)
   end
 
   def apply
@@ -111,6 +104,26 @@ class ExternalPatch < Patch
       patchfile = Pathname.pwd.children.first
       safe_system "/usr/bin/patch", "-g", "0", "-f", "-d", dir, "-#{strip}", "-i", patchfile
     end
+  end
+
+  def url
+    resource.url
+  end
+
+  def fetch
+    resource.fetch
+  end
+
+  def verify_download_integrity(fn)
+    resource.verify_download_integrity(fn)
+  end
+
+  def cached_download
+    resource.cached_download
+  end
+
+  def clear_cache
+    resource.clear_cache
   end
 
   def inspect
@@ -131,7 +144,7 @@ class LegacyPatch < ExternalPatch
   end
 
   def fetch
-    resource.clear_cache
+    clear_cache
     super
   end
 
@@ -142,6 +155,6 @@ class LegacyPatch < ExternalPatch
   def apply
     super
   ensure
-    resource.clear_cache
+    clear_cache
   end
 end
