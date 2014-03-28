@@ -1,4 +1,4 @@
-class Keg
+class Keg < Pathname
   PREFIX_PLACEHOLDER = "@@HOMEBREW_PREFIX@@".freeze
   CELLAR_PLACEHOLDER = "@@HOMEBREW_CELLAR@@".freeze
 
@@ -42,10 +42,13 @@ class Keg
 
     files.group_by { |f| f.stat.ino }.each_value do |first, *rest|
       s = first.open("rb", &:read)
-      s.gsub!(old_cellar, new_cellar)
-      s.gsub!(old_prefix, new_prefix)
-      first.atomic_write(s)
-      rest.each { |file| FileUtils.ln(first, file, :force => true) }
+      changed = s.gsub!(old_cellar, new_cellar)
+      changed = s.gsub!(old_prefix, new_prefix) || changed
+
+      if changed
+        first.atomic_write(s)
+        rest.each { |file| FileUtils.ln(first, file, :force => true) }
+      end
     end
   end
 
@@ -157,7 +160,7 @@ class Keg
     script_files = []
 
     # find all files with shebangs
-    Pathname.new(self).find do |pn|
+    find do |pn|
       next if pn.symlink? or pn.directory?
       script_files << pn if pn.text_executable?
     end
