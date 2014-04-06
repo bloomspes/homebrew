@@ -83,7 +83,7 @@ class Pathname
     src = Pathname(src).expand_path(self)
     dst = join File.basename(new_basename)
     mkpath
-    FileUtils.ln_s src.relative_path_from(dst.parent), dst
+    FileUtils.ln_sf src.relative_path_from(dst.parent), dst
   end
   protected :install_symlink_p
 
@@ -202,16 +202,20 @@ class Pathname
   end
 
   def compression_type
-    # Don't treat jars or wars as compressed
-    return nil if self.extname == '.jar'
-    return nil if self.extname == '.war'
-
-    # OS X installer package
-    return :pkg if self.extname == '.pkg'
-
-    # If the filename ends with .gz not preceded by .tar
-    # then we want to gunzip but not tar
-    return :gzip_only if self.extname == '.gz'
+    case extname
+    when ".jar", ".war"
+      # Don't treat jars or wars as compressed
+      return
+    when ".pkg"
+      # OS X installer package
+      return :pkg
+    when ".gz"
+      # If the filename ends with .gz not preceded by .tar
+      # then we want to gunzip but not tar
+      return :gzip_only
+    when ".bz2"
+      return :bzip2_only
+    end
 
     # Get enough of the file to detect common file types
     # POSIX tar magic has a 257 byte offset
