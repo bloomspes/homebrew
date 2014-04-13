@@ -2,8 +2,8 @@ require 'formula'
 
 class Pugixml < Formula
   homepage 'http://pugixml.org/'
-  url 'http://pugixml.googlecode.com/files/pugixml-1.2.tar.gz'
-  sha1 '1eee11df5d61fea31a977d98bd2dcc9421231f9e'
+  url 'https://github.com/zeux/pugixml/releases/download/v1.4/pugixml-1.4.tar.gz'
+  sha1 '76d16b3be36390b1f17da8b80f6e064287d64686'
 
   depends_on 'cmake' => :build
 
