@@ -17,12 +17,12 @@ module Homebrew extend self
     cd HOMEBREW_REPOSITORY
     git_init_if_necessary
 
-    tapped_formulae = Dir['Library/Formula/*'].map do |formula|
-      path = Pathname.new formula
+    taps = HOMEBREW_LIBRARY.join("Taps")
+    tapped_formulae = []
+    HOMEBREW_LIBRARY.join("Formula").children.each do |path|
       next unless path.symlink?
-      Pathname.new(path.realpath.to_s.gsub(/.*Taps\//, '')) rescue nil
+      tapped_formulae << path.resolved_path.relative_path_from(taps)
     end
-    tapped_formulae.compact!
     unlink_tap_formula(tapped_formulae)
 
     report = Report.new
@@ -38,18 +38,17 @@ module Homebrew extend self
     # this procedure will be removed in the future if it seems unnecessasry
     rename_taps_dir_if_necessary
 
-    Dir["Library/Taps/*/"].each do |user|
-      Dir["#{user}*/"].each do |repo|
-        cd repo do
-          begin
-            updater = Updater.new
-            updater.pull!
-            report.merge!(updater.report) do |key, oldval, newval|
-              oldval.concat(newval)
-            end
-          rescue
-            repo =~ %r{^Library/Taps/([\w_-]+)/(homebrew-)?([\w_-]+)}
-            onoe "Failed to update tap: #$1/#$3"
+    each_tap do |user, repo|
+      repo.cd do
+        updater = Updater.new
+
+        begin
+          updater.pull!
+        rescue
+          onoe "Failed to update tap: #{user.basename}/#{repo.basename.sub("homebrew-", "")}"
+        else
+          report.merge!(updater.report) do |key, oldval, newval|
+            oldval.concat(newval)
           end
         end
       end
