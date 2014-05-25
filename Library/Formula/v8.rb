@@ -29,8 +29,7 @@ class V8 < Formula
     (buildpath/'build/gyp').install resource('gyp')
 
     system "make", "native",
-                   "-j#{ENV.make_jobs}",
-                   "library=shared",
+                   "library=static",
                    "snapshot=on",
                    "console=readline",
                    "i18nsupport=off"
