@@ -4,9 +4,11 @@ require 'extend/ARGV'
 require 'bottle_version'
 
 def bottle_filename options={}
-  options = { :tag => bottle_tag }.merge(options)
-  suffix = ".#{options[:tag]}#{bottle_suffix(options[:revision])}"
-  "#{options[:name]}-#{options[:version]}#{suffix}"
+  name     = options.fetch(:name)
+  version  = options.fetch(:version)
+  tag      = options.fetch(:tag)
+  revision = options.fetch(:revision)
+  "#{name}-#{version}.#{tag}#{bottle_suffix(revision)}"
 end
 
 def built_as_bottle? f
@@ -66,18 +68,23 @@ class BottleCollector
     @bottles = {}
   end
 
-  def add(checksum, tag)
-    @bottles[tag] = checksum
-  end
-
   def fetch_bottle_for(tag)
     return [@bottles[tag], tag] if @bottles[tag]
 
     find_altivec_tag(tag) || find_or_later_tag(tag)
   end
 
-  def keys; @bottles.keys; end
-  def [](arg); @bottles[arg]; end
+  def keys
+    @bottles.keys
+  end
+
+  def [](key)
+    @bottles[key]
+  end
+
+  def []=(key, value)
+    @bottles[key] = value
+  end
 
   # This allows generic Altivec PPC bottles to be supported in some
   # formulae, while also allowing specific bottles in others; e.g.,
