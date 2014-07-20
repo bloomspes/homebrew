@@ -45,7 +45,7 @@ end
 def ohai title, *sput
   title = Tty.truncate(title) if $stdout.tty? && !ARGV.verbose?
   puts "#{Tty.blue}==>#{Tty.white} #{title}#{Tty.reset}"
-  puts sput unless sput.empty?
+  puts sput
 end
 
 def oh1 title
@@ -206,7 +206,6 @@ def which_editor
 end
 
 def exec_editor *args
-  return if args.to_s.empty?
   safe_exec(which_editor, *args)
 end
 
