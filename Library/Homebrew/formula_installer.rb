@@ -241,7 +241,7 @@ class FormulaInstaller
 
   def install_requirement_default_formula?(req, build)
     return false unless req.default_formula?
-    return false if build.without?(req)
+    return false if build.without?(req) && (req.recommended? || req.optional?)
     return true unless req.satisfied?
     pour_bottle? || build_bottle?
   end
@@ -303,15 +303,9 @@ class FormulaInstaller
   end
 
   def effective_build_options_for(dependent, inherited_options=[])
-    if dependent == f
-      build = dependent.build.dup
-      build.args |= options
-      build
-    else
-      build = dependent.build.dup
-      build.args |= inherited_options
-      build
-    end
+    args  = dependent.build.used_options
+    args |= dependent == f ? options : inherited_options
+    BuildOptions.new(args, dependent.options)
   end
 
   def inherited_options_for(dep)
