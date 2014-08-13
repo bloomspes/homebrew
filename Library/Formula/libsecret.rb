@@ -6,23 +6,33 @@ class Libsecret < Formula
   sha1 "af62de3958bbe0ccf59a02101a6704e036378a6f"
 
   bottle do
-    sha1 "4c39ca74dde90acafc17fc86ffe03559462d2aad" => :mavericks
-    sha1 "c099feb51932a8883ac828b436acbdd154862dc2" => :mountain_lion
-    sha1 "f107bba883485f8ffc18aabd8d6c4e063be0aff0" => :lion
+    revision 1
+    sha1 "d66a78d9886a1c3264efc8837f76be38b5f537a5" => :mavericks
+    sha1 "413b3bc851bc3c9cdc1e9a8f0d325ad974f97fcc" => :mountain_lion
+    sha1 "d2118e640acacfc9028e9d4e9b4f90149d560e10" => :lion
   end
 
   depends_on "pkg-config" => :build
   depends_on "gnu-sed" => :build
   depends_on "intltool" => :build
   depends_on "gettext" => :build
+  depends_on "vala" => :optional
+  depends_on "gobject-introspection" => :recommended
   depends_on "glib"
   depends_on "libgcrypt"
 
   def install
-    system "./configure", "--disable-debug",
-                          "--disable-dependency-tracking",
-                          "--disable-silent-rules",
-                          "--prefix=#{prefix}"
+    args = %W[
+        --disable-debug
+        --disable-dependency-tracking
+        --disable-silent-rules
+        --prefix=#{prefix}
+    ]
+
+    args << "--enable-gobject-introspection" if build.with? "gobject-introspection"
+    args << "--enable-vala" if build.with? "vala"
+
+    system "./configure", *args
 
     # https://bugzilla.gnome.org/show_bug.cgi?id=734630
     inreplace "Makefile", "sed", "gsed"
