@@ -70,15 +70,15 @@ class OptionsTests < Homebrew::TestCase
   end
 
   def test_union_returns_options
-    assert_instance_of Options, (@options + Options.new)
+    assert_instance_of Options, @options + Options.new
   end
 
   def test_difference_returns_options
-    assert_instance_of Options, (@options - Options.new)
+    assert_instance_of Options, @options - Options.new
   end
 
   def test_shovel_returns_self
-    assert_same @options, (@options << Option.new("foo"))
+    assert_same @options, @options << Option.new("foo")
   end
 
   def test_as_flags
@@ -96,26 +96,6 @@ class OptionsTests < Homebrew::TestCase
     option = Option.new("foo")
     @options << option
     assert_equal [option], @options.to_ary
-  end
-
-  def test_concat_array
-    option = Option.new("foo")
-    @options.concat([option])
-    assert_includes @options, option
-    assert_equal [option], @options.to_a
-  end
-
-  def test_concat_options
-    option = Option.new("foo")
-    opts = Options.new
-    opts << option
-    @options.concat(opts)
-    assert_includes @options, option
-    assert_equal [option], @options.to_a
-  end
-
-  def test_concat_returns_self
-    assert_same @options, (@options.concat([]))
   end
 
   def test_intersection

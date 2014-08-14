@@ -85,19 +85,19 @@ class Options
   end
 
   def +(o)
-    Options.new(@options + o)
+    self.class.new(@options + o)
   end
 
   def -(o)
-    Options.new(@options - o)
+    self.class.new(@options - o)
   end
 
   def &(o)
-    Options.new(@options & o)
+    self.class.new(@options & o)
   end
 
   def |(o)
-    Options.new(@options | o)
+    self.class.new(@options | o)
   end
 
   def *(arg)
@@ -114,11 +114,6 @@ class Options
 
   def include?(o)
     any? { |opt| opt == o || opt.name == o || opt.flag == o }
-  end
-
-  def concat(o)
-    @options.merge(o)
-    self
   end
 
   alias_method :to_ary, :to_a
