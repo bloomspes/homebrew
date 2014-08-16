@@ -245,7 +245,11 @@ class Formula
   end
 
   def skip_cxxstdlib_check?
-    self.class.cxxstdlib.include?(:skip)
+    false
+  end
+
+  def require_universal_deps?
+    false
   end
 
   # yields self with current working directory set to the uncompressed tarball
@@ -708,16 +712,9 @@ class Formula
       @keg_only_reason = KegOnlyReason.new(reason, explanation)
     end
 
-    # Flag for marking whether this formula needs C++ standard library
-    # compatibility check
-    def cxxstdlib
-      @cxxstdlib ||= Set.new
-    end
-
-    # Explicitly request changing C++ standard library compatibility check
-    # settings. Use with caution!
+    # Pass :skip to this method to disable post-install stdlib checking
     def cxxstdlib_check check_type
-      cxxstdlib << check_type
+      define_method(:skip_cxxstdlib_check?) { true } if check_type == :skip
     end
 
     # For Apple compilers, this should be in the format:
@@ -757,10 +754,6 @@ class Formula
       standards.each do |standard|
         @cc_failures.merge CompilerFailure.for_standard standard
       end
-    end
-
-    def require_universal_deps
-      specs.each { |spec| spec.build.universal = true }
     end
 
     def test &block
