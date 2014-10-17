@@ -150,6 +150,7 @@ module FormulaCellarChecks
   private
 
   def relative_glob(dir, pattern)
+    return [] unless Pathname.new(dir).directory?
     Dir.chdir(dir) { Dir[pattern] }
   end
 end

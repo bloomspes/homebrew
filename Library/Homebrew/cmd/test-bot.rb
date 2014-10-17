@@ -154,7 +154,13 @@ module Homebrew
 
       # Tap repository if required, this is done before everything else
       # because Formula parsing and/or git commit hash lookup depends on it.
-      test "brew", "tap", @tap if @tap && @repository_requires_tapping
+      if @tap
+        if @repository_requires_tapping
+          test "brew", "tap", @tap
+        else
+          test "brew", "tap", "--repair"
+        end
+      end
 
       begin
         formula = Formulary.factory(argument)
@@ -222,7 +228,7 @@ module Homebrew
 
       # Use Jenkins environment variables if present.
       if no_args? and ENV['GIT_PREVIOUS_COMMIT'] and ENV['GIT_COMMIT'] \
-         and not ENV['ghprbPullId']
+         and not ENV['ghprbPullLink']
         diff_start_sha1 = shorten_revision ENV['GIT_PREVIOUS_COMMIT']
         diff_end_sha1 = shorten_revision ENV['GIT_COMMIT']
         test "brew", "update" if current_branch == "master"
@@ -233,17 +239,9 @@ module Homebrew
       end
 
       # Handle Jenkins pull request builder plugin.
-      if ENV['ghprbPullId'] and ENV['GIT_URL']
-        git_url = ENV['GIT_URL']
-        git_match = git_url.match %r{.*github.com[:/](\w+/\w+).*}
-        if git_match
-          github_repo = git_match[1]
-          pull_id = ENV['ghprbPullId']
-          @url = "https://github.com/#{github_repo}/pull/#{pull_id}"
-          @hash = nil
-        else
-          puts "Invalid 'ghprbPullId' environment variable value!"
-        end
+      if ENV['ghprbPullLink']
+        @url = ENV['ghprbPullLink']
+        @hash = nil
       end
 
       if no_args?
