@@ -14,6 +14,7 @@
 # --local:        Ask Homebrew to write verbose logs under ./logs/ and set HOME to ./home/
 # --tap=<tap>:    Use the git repository of the given tap
 # --dry-run:      Just print commands, don't run them.
+# --fail-fast:    Immediately exit on a failing step.
 #
 # --ci-master:         Shortcut for Homebrew master branch CI options.
 # --ci-pr:             Shortcut for Homebrew pull request CI options.
@@ -134,6 +135,8 @@ module Homebrew
         end
         FileUtils.rm(log) unless ARGV.include? "--keep-logs"
       end
+
+      exit 1 if ARGV.include?("--fail-fast") && @status == :failed
     end
   end
 
@@ -236,8 +239,7 @@ module Homebrew
         test "brew", "update" if current_branch == "master"
         diff_end_sha1 = current_sha1
       elsif @url
-        test "brew", "update"  if current_branch == "master"
-        diff_start_sha1 = current_sha1
+        test "brew", "update" if current_branch == "master"
       end
 
       # Handle Jenkins pull request builder plugin.
@@ -259,7 +261,8 @@ module Homebrew
         diff_end_sha1 = @hash
         @name = @hash
       elsif @url
-        test "git", "checkout", current_sha1
+        diff_start_sha1 = current_sha1
+        test "git", "checkout", diff_start_sha1
         test "brew", "pull", "--clean", @url
         diff_end_sha1 = current_sha1
         @short_url = @url.gsub('https://github.com/', '')
