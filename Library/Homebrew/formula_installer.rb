@@ -19,15 +19,20 @@ class FormulaInstaller
 
   def self.mode_attr_accessor(*names)
     attr_accessor(*names)
-    names.each { |name| define_method("#{name}?") { !!send(name) }}
+    private(*names)
+    names.each do |name|
+      predicate = "#{name}?"
+      define_method(predicate) { !!send(name) }
+      private(predicate)
+    end
   end
 
   attr_reader :formula
   attr_accessor :options
   mode_attr_accessor :show_summary_heading, :show_header
   mode_attr_accessor :build_from_source, :build_bottle, :force_bottle
-  mode_attr_accessor :ignore_deps, :only_deps, :interactive
-  mode_attr_accessor :verbose, :debug
+  mode_attr_accessor :ignore_deps, :only_deps, :interactive, :git
+  mode_attr_accessor :verbose, :debug, :quieter
 
   def initialize(formula)
     @formula = formula
@@ -38,7 +43,9 @@ class FormulaInstaller
     @build_bottle = false
     @force_bottle = false
     @interactive = false
+    @git = false
     @verbose = false
+    @quieter = false
     @debug = false
     @options = Options.new
 
@@ -103,12 +110,6 @@ class FormulaInstaller
 
   def check_install_sanity
     raise FormulaInstallationAlreadyAttemptedError, formula if @@attempted.include?(formula)
-
-    if formula.installed?
-      msg = "#{formula.name}-#{formula.installed_version} already installed"
-      msg << ", it's just not linked" unless formula.linked_keg.symlink? or formula.keg_only?
-      raise FormulaAlreadyInstalledError, msg
-    end
 
     unless ignore_deps?
       unlinked_deps = formula.recursive_dependencies.map(&:to_formula).select do |dep|
@@ -353,7 +354,7 @@ class FormulaInstaller
     fi.options           |= dep.options
     fi.options           |= inherited_options
     fi.build_from_source  = build_from_source?
-    fi.verbose            = verbose? unless verbose == :quieter
+    fi.verbose            = verbose? && !quieter?
     fi.debug              = debug?
     fi.prelude
     oh1 "Installing #{formula.name} dependency: #{Tty.green}#{dep.name}#{Tty.reset}"
@@ -427,11 +428,8 @@ class FormulaInstaller
       args << "--bottle-arch=#{ARGV.bottle_arch}" if ARGV.bottle_arch
     end
 
-    if interactive?
-      args << "--interactive"
-      args << "--git" if interactive == :git
-    end
-
+    args << "--git" if git?
+    args << "--interactive" if interactive?
     args << "--verbose" if verbose?
     args << "--debug" if debug?
     args << "--cc=#{ARGV.cc}" if ARGV.cc
