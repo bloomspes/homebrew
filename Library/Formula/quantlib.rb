@@ -21,7 +21,6 @@ class Quantlib < Formula
     depends_on 'boost'
   end
 
-<<<<<<< HEAD
   def options
     [
       ["--universal", "Build universal binaries."],
