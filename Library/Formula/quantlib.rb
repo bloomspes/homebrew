@@ -31,7 +31,7 @@ class Quantlib < Formula
 
   # boost 1.57 compatibility; backported from master
   # https://github.com/lballabio/quantlib/issues/163
-  def patch
+  patch do
     url "https://gist.githubusercontent.com/tdsmith/b2d5909db67b3173db02/raw/364ae3a09eb1dbb8bd14a2b71d42fda0b4e0d8cc/quantlib-boost-157.diff"
     sha1 "2ddc873bfb1baf33c7fc587211c281600ddfa182"
   end
