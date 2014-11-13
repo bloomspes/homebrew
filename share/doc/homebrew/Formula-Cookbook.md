@@ -108,7 +108,7 @@ class Foo < Formula
   def install
     system "./configure", "--prefix=#{prefix}", "--disable-debug", "--disable-dependency-tracking"
 #   system "cmake", ".", *std_cmake_args
-    system "make install"
+    system "make", "install"
   end
 end
 ```
@@ -384,7 +384,7 @@ In particular, when a test needs to be performed before installation use `onoe` 
 
 ```ruby
 if some_test?
-  system "make install"
+  system "make", "install"
 else
   onoe "Error! Something is wrong."
 end
@@ -512,7 +512,7 @@ Instead of `git diff | pbcopy`, for some editors `git diff >> path/to/your/formu
 
 # Advanced Formula Tricks
 
-If anything isn’t clear, you can usually figure it out with some `grep` and the `Library/Formula` directory. Please amend this wiki page if you think it will help!
+If anything isn’t clear, you can usually figure it out with some `grep` and the `Library/Formula` directory. Please amend this document if you think it will help!
 
 
 ## Unstable versions (`HEAD`, `devel`)
@@ -900,7 +900,7 @@ class Foo < Formula
     ENV.deparallelize
     ENV.no_optimization
     system "make"  # separate make and make install steps
-    system "make install"
+    system "make", "install"
   end
 end
 ```
