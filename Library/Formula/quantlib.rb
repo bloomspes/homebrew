@@ -2,8 +2,8 @@ require 'formula'
 
 class Quantlib < Formula
   homepage 'http://quantlib.org/'
-  url 'https://downloads.sourceforge.net/project/quantlib/QuantLib/1.4/QuantLib-1.4.tar.gz'
-  sha1 'f31f4651011a8e38e8b2cc6c457760fe61863391'
+  url 'https://downloads.sourceforge.net/project/quantlib/QuantLib/1.4.1/QuantLib-1.4.1.tar.gz'
+  sha1 'ff7c6ceba736449335333e34d89140f861a17090'
 
   bottle do
     cellar :any
@@ -27,13 +27,6 @@ class Quantlib < Formula
       ["--with-examples", "Also install examples."],
       ["--with-benchmark", "Also install benchmark."]
     ]
-  end
-
-  # boost 1.57 compatibility; backported from master
-  # https://github.com/lballabio/quantlib/issues/163
-  patch do
-    url "https://gist.githubusercontent.com/tdsmith/b2d5909db67b3173db02/raw/364ae3a09eb1dbb8bd14a2b71d42fda0b4e0d8cc/quantlib-boost-157.diff"
-    sha1 "2ddc873bfb1baf33c7fc587211c281600ddfa182"
   end
 
   def install
