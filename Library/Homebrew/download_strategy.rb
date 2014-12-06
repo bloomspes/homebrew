@@ -66,19 +66,20 @@ class VCSDownloadStrategy < AbstractDownloadStrategy
   def clear_cache
     cached_location.rmtree if cached_location.exist?
   end
+
+  def head?
+    resource.version.head?
+  end
 end
 
 class CurlDownloadStrategy < AbstractDownloadStrategy
-  def mirrors
-    @mirrors ||= resource.mirrors.dup
-  end
+  attr_reader :mirrors, :tarball_path, :temporary_path
 
-  def tarball_path
-    @tarball_path ||= Pathname.new("#{HOMEBREW_CACHE}/#{name}-#{resource.version}#{ext}")
-  end
-
-  def temporary_path
-    @temporary_path ||= Pathname.new("#{tarball_path}.incomplete")
+  def initialize(name, resource)
+    super
+    @mirrors = resource.mirrors.dup
+    @tarball_path = HOMEBREW_CACHE.join("#{name}-#{resource.version}#{ext}")
+    @temporary_path = Pathname.new("#{tarball_path}.incomplete")
   end
 
   def cached_location
@@ -350,7 +351,7 @@ end
 
 class SubversionDownloadStrategy < VCSDownloadStrategy
   def cache_tag
-    resource.version.head? ? "svn-HEAD" : "svn"
+    head? ? "svn-HEAD" : "svn"
   end
 
   def repo_valid?
@@ -621,12 +622,10 @@ class MercurialDownloadStrategy < VCSDownloadStrategy
   def cache_tag; "hg" end
 
   def hgpath
-    # Note: #{HOMEBREW_PREFIX}/share/python/hg is deprecated
     @path ||= %W[
       #{which("hg")}
       #{HOMEBREW_PREFIX}/bin/hg
       #{HOMEBREW_PREFIX}/opt/mercurial/bin/hg
-      #{HOMEBREW_PREFIX}/share/python/hg
       ].find { |p| File.executable? p }
   end
 
