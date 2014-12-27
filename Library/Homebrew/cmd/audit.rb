@@ -17,8 +17,10 @@ module Homebrew
       ARGV.formulae
     end
 
+    strict = ARGV.include? "--strict"
+
     ff.each do |f|
-      fa = FormulaAuditor.new f
+      fa = FormulaAuditor.new(f, :strict => strict)
       fa.audit
 
       unless fa.problems.empty?
@@ -39,6 +41,7 @@ class FormulaText
     @text = path.open("rb", &:read)
   end
 
+
   def without_patch
     @text.split("\n__END__").first
   end
@@ -53,6 +56,10 @@ class FormulaText
 
   def has_trailing_newline?
     /\Z\n/ =~ @text
+  end
+
+  def has_test?
+    @text.include? "test do"
   end
 end
 
@@ -76,8 +83,11 @@ class FormulaAuditor
     swig
   ]
 
-  def initialize(formula)
+  FILEUTILS_METHODS = FileUtils.singleton_methods(false).join "|"
+
+  def initialize(formula, options={})
     @formula = formula
+    @strict = !!options[:strict]
     @problems = []
     @text = FormulaText.new(formula.path)
     @specs = %w{stable devel head}.map { |s| formula.send(s) }.compact
@@ -98,6 +108,12 @@ class FormulaAuditor
 
     unless text.has_trailing_newline?
       problem "File should end with a newline"
+    end
+
+    if @strict
+      unless text.has_test?
+        problem "A `test do` test block should be added"
+      end
     end
   end
 
@@ -161,6 +177,15 @@ class FormulaAuditor
         Formulary.factory(c.name)
       rescue FormulaUnavailableError
         problem "Can't find conflicting formula #{c.name.inspect}."
+      end
+    end
+  end
+
+  def audit_options
+    formula.options.each do |o|
+      next unless @strict
+      if o.name !~ /with(out)?-/ && o.name != "c++11" && o.name != "universal" && o.name != "32-bit"
+        problem "Options should begin with with/without. Migrate '--#{o.name}' with `deprecated_option`."
       end
     end
   end
@@ -522,6 +547,30 @@ class FormulaAuditor
     if line =~ /(Dir\[("[^\*{},]+")\])/
       problem "#{$1} is unnecessary; just use #{$2}"
     end
+
+    if line =~ /system (["'](#{FILEUTILS_METHODS}))["' ]/
+      system = $1
+      method = $2
+      problem "Use the `#{method}` Ruby method instead of `system #{system}`"
+    end
+
+    if @strict
+      if line =~ /system (["'][^"' ]*\s[^"' ]*["'])/
+        bad_system = $1
+        good_system = bad_system.gsub(" ", "\", \"")
+        problem "Use `system #{good_system}` instead of `system #{bad_system}` "
+      end
+
+      if line =~ /^[^#"]*('[^']*')/
+        bad_quotes = $1
+        good_quotes = bad_quotes.gsub "'", "\""
+        problem "use double-quotes for `#{good_quotes}` instead of `#{bad_quotes}`"
+      end
+
+      if line =~ /(require ["']formula["'])/
+        problem "`#{$1}` is now unnecessary"
+      end
+    end
   end
 
   def audit_conditional_dep(dep, condition, line)
@@ -550,6 +599,7 @@ class FormulaAuditor
     audit_urls
     audit_deps
     audit_conflicts
+    audit_options
     audit_patches
     audit_text
     text.without_patch.split("\n").each_with_index { |line, lineno| audit_line(line, lineno+1) }
