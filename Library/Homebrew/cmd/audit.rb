@@ -41,7 +41,6 @@ class FormulaText
     @text = path.open("rb", &:read)
   end
 
-
   def without_patch
     @text.split("\n__END__").first
   end
@@ -56,10 +55,6 @@ class FormulaText
 
   def has_trailing_newline?
     /\Z\n/ =~ @text
-  end
-
-  def has_test?
-    @text.include? "test do"
   end
 end
 
@@ -109,9 +104,11 @@ class FormulaAuditor
     unless text.has_trailing_newline?
       problem "File should end with a newline"
     end
+  end
 
+  def audit_class
     if @strict
-      unless text.has_test?
+      unless formula.test_defined?
         problem "A `test do` test block should be added"
       end
     end
@@ -280,7 +277,7 @@ class FormulaAuditor
   end
 
   def audit_specs
-    if head_only?(formula) && formula.tap != "homebrew/homebrew-headonly"
+    if head_only?(formula) && formula.tap != "homebrew/homebrew-head-only"
       problem "Head-only (no stable download)"
     end
 
@@ -548,7 +545,7 @@ class FormulaAuditor
       problem "#{$1} is unnecessary; just use #{$2}"
     end
 
-    if line =~ /system (["'](#{FILEUTILS_METHODS}))["' ]/
+    if line =~ /system (["'](#{FILEUTILS_METHODS})["' ])/o
       system = $1
       method = $2
       problem "Use the `#{method}` Ruby method instead of `system #{system}`"
@@ -559,12 +556,6 @@ class FormulaAuditor
         bad_system = $1
         good_system = bad_system.gsub(" ", "\", \"")
         problem "Use `system #{good_system}` instead of `system #{bad_system}` "
-      end
-
-      if line =~ /^[^#"]*('[^']*')/
-        bad_quotes = $1
-        good_quotes = bad_quotes.gsub "'", "\""
-        problem "use double-quotes for `#{good_quotes}` instead of `#{bad_quotes}`"
       end
 
       if line =~ /(require ["']formula["'])/
@@ -595,6 +586,7 @@ class FormulaAuditor
 
   def audit
     audit_file
+    audit_class
     audit_specs
     audit_urls
     audit_deps

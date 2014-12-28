@@ -438,8 +438,10 @@ module Homebrew
         end
         test "brew", "test", "--verbose", formula_name if formula.test_defined?
         if testable_dependents.any?
-          test "brew", "fetch", *uninstalled_testable_dependents
-          test "brew", "install", *uninstalled_testable_dependents
+          if uninstalled_testable_dependents.any?
+            test "brew", "fetch", *uninstalled_testable_dependents
+            test "brew", "install", *uninstalled_testable_dependents
+          end
           test "brew", "test", *testable_dependents
         end
         test "brew", "uninstall", "--force", formula_name
@@ -473,7 +475,8 @@ module Homebrew
       git "rebase", "--abort"
       git "reset", "--hard"
       git "checkout", "-f", "master"
-      git "clean", "--force", "-dx"
+      git "clean", "-fdx"
+      # TODO: on failure rerun with: -ffdx
     end
 
     def cleanup_after
@@ -481,7 +484,8 @@ module Homebrew
 
       checkout_args = []
       if ARGV.include? '--cleanup'
-        test "git", "clean", "--force", "-dx"
+        test "git", "clean", "-fdx"
+        test "git", "clean", "-ffdx" if steps.last.failed?
         checkout_args << "-f"
       end
 
@@ -748,7 +752,7 @@ module Homebrew
       failed_steps = []
       tests.each do |test|
         test.steps.each do |step|
-          next unless step.failed?
+          next if step.passed?
           failed_steps << step.command_short
         end
       end
