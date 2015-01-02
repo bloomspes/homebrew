@@ -652,8 +652,7 @@ class Formula
     logfn = "#{logd}/%02d.%s" % [@exec_count, File.basename(cmd).split(' ').first]
     mkdir_p(logd)
 
-    log = File.open(logfn, "w")
-    begin
+    File.open(logfn, "w") do |log|
       log.puts Time.now, "", cmd, args, ""
       log.flush
 
@@ -686,12 +685,18 @@ class Formula
         log.flush
         Kernel.system "/usr/bin/tail", "-n", "5", logfn unless verbose
         log.puts
-        require 'cmd/config'
-        Homebrew.dump_build_config(log)
-        raise BuildError.new(self, cmd, args, ENV.to_hash)
+
+        require "cmd/config"
+        require "cmd/--env"
+
+        env = ENV.to_hash
+
+        Homebrew.dump_verbose_config(log)
+        log.puts
+        Homebrew.dump_build_env(env, log)
+
+        raise BuildError.new(self, cmd, args, env)
       end
-    ensure
-      log.close
     end
   end
 

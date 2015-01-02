@@ -380,7 +380,13 @@ module Homebrew
       end
 
       begin
-        deps.each { |d| CompilerSelector.select_for(d.to_formula) }
+        deps.each do |dep|
+          if dep.is_a?(TapDependency) && dep.tap
+            tap_dir = Homebrew.homebrew_git_repo dep.tap
+            test "brew", "tap", dep.tap unless tap_dir.directory?
+          end
+          CompilerSelector.select_for(dep.to_formula)
+        end
         CompilerSelector.select_for(formula)
       rescue CompilerSelectionError => e
         unless installed_gcc
@@ -596,7 +602,8 @@ module Homebrew
     ENV['HOMEBREW_NO_EMOJI'] = '1'
     if ARGV.include? '--ci-master' or ARGV.include? '--ci-pr' \
        or ARGV.include? '--ci-testing'
-      ARGV << '--cleanup' << '--junit' << '--local'
+      ARGV << "--cleanup" if ENV["JENKINS_HOME"] || ENV["TRAVIS_COMMIT"]
+      ARGV << "--junit" << "--local"
     end
     if ARGV.include? '--ci-master'
       ARGV << '--no-bottle' << '--email'
