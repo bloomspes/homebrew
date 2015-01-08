@@ -52,9 +52,9 @@ class Formula
   attr_reader :head
 
   # The currently active {SoftwareSpec}.
-  # Defaults to stable unless `--devel` or `--HEAD` is passed.
-  # @private
+  # @see #determine_active_spec
   attr_reader :active_spec
+  protected :active_spec
 
   # The {PkgVersion} for this formula with version and {#revision} information.
   attr_reader :pkg_version
@@ -436,7 +436,9 @@ class Formula
   end
 
   def inspect
-    "#<#{self.class.name}: #{path}>"
+    s = "#<Formula #{name} ("
+    s << if head? then "head" elsif devel? then "devel" else "stable" end
+    s << ") #{path}>"
   end
 
   # Standard parameters for CMake builds.

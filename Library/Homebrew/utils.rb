@@ -120,12 +120,21 @@ module Homebrew
     HOMEBREW_REPOSITORY.cd { `git show -s --format="%cr" HEAD 2>/dev/null`.chuzzle }
   end
 
-  def self.install_gem_setup_path! gem
+  def self.install_gem_setup_path! gem, executable=gem
     require "rubygems"
     ENV["PATH"] = "#{Gem.user_dir}/bin:#{ENV["PATH"]}"
-    return if quiet_system "gem", "list", "--installed", gem
-    system "gem", "install", "--no-ri", "--no-rdoc",
-           "--user-install", gem
+
+    unless quiet_system "gem", "list", "--installed", gem
+      safe_system "gem", "install", "--no-ri", "--no-rdoc",
+                                    "--user-install", gem
+    end
+
+    unless which executable
+      odie <<-EOS.undent
+        The '#{gem}' gem is installed but couldn't find '#{executable}' in the PATH:
+        #{ENV["PATH"]}
+      EOS
+    end
   end
 end
 
@@ -199,17 +208,24 @@ end
 
 def which_editor
   editor = ENV.values_at('HOMEBREW_EDITOR', 'VISUAL', 'EDITOR').compact.first
-  # If an editor wasn't set, try to pick a sane default
   return editor unless editor.nil?
 
   # Find Textmate
-  return 'mate' if which "mate"
+  editor = "mate" if which "mate"
   # Find BBEdit / TextWrangler
-  return 'edit' if which "edit"
+  editor ||= "edit" if which "edit"
   # Find vim
-  return 'vim' if which "vim"
+  editor ||= "vim" if which "vim"
   # Default to standard vim
-  return '/usr/bin/vim'
+  editor ||= "/usr/bin/vim"
+
+  opoo <<-EOS.undent
+    Using #{editor} because no editor was set in the environment.
+    This may change in the future, so we recommend setting EDITOR, VISUAL,
+    or HOMEBREW_EDITOR to your preferred text editor.
+  EOS
+
+  editor
 end
 
 def exec_editor *args
