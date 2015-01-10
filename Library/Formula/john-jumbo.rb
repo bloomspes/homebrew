@@ -5,9 +5,10 @@ class JohnJumbo < Formula
   version "1.8.0"
 
   bottle do
-    sha1 "7b1fd2d3d9f12567c70c4e12cbf8cdc525f0f61e" => :yosemite
-    sha1 "4514927c45452ffebaeef56e068d0ea1e709e8c2" => :mavericks
-    sha1 "c91ebc708391e78c2a586c90da7b85cd394fa0ee" => :mountain_lion
+    revision 1
+    sha1 "e1bbded6163855cbe005e468ce63d7078694108e" => :yosemite
+    sha1 "6ca279b1df3cc6e98cb43ecbc1237f5e1ef42d3b" => :mavericks
+    sha1 "f4569b99a353a7995371ba41c69d7302c40ca36d" => :mountain_lion
   end
 
   conflicts_with "john", :because => "both install the same binaries"
@@ -58,7 +59,6 @@ class JohnJumbo < Formula
   end
 
   test do
-    ENV["HOME"] = testpath
     touch "john2.pot"
     system "echo dave:`printf secret | openssl md5` > test"
     output = shell_output("#{bin}/john --pot=#{testpath}/john2.pot --format=raw-md5 test")
