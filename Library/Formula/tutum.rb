@@ -2,14 +2,14 @@ require "formula"
 
 class Tutum < Formula
   homepage "https://www.tutum.co/"
-  url "https://github.com/tutumcloud/tutum-cli/archive/v0.11.5.tar.gz"
-  sha1 "9de3c2b17cc66d3531ed175d4a6a9f8bb7560170"
+  url "https://github.com/tutumcloud/tutum-cli/archive/v0.11.5.1.tar.gz"
+  sha1 "cba0333eb55322320dbfad90840b2e260cb1e9bf"
 
   bottle do
     cellar :any
-    sha1 "2daa301e429b6cacf37bdf7fd725fc27b976ed24" => :yosemite
-    sha1 "069c6718729a7da74de02c222a9a0f82014d94b0" => :mavericks
-    sha1 "8e4b0407f95bf34adc8dcbf2843673711c9cca82" => :mountain_lion
+    sha1 "1d950e6fcc51ace7b4b11a4311c26434e7f439f7" => :yosemite
+    sha1 "c88aeeee454dac9eaba90450b248c5bf3a50c8a9" => :mavericks
+    sha1 "e3189cfa513d954a75c74b638f0d735488b3c282" => :mountain_lion
   end
 
   depends_on :python if MacOS.version <= :snow_leopard
