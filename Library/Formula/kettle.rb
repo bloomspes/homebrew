@@ -7,56 +7,16 @@ class Kettle < Formula
     rm_rf Dir["*.{bat}"]
     libexec.install Dir["*"]
 
-    (var + "log/kettle").mkpath
-    (etc + "kettle/simple-jndi").mkpath
+    (etc+"kettle").install libexec+"pwd/carte-config-master-8080.xml" => "carte-config.xml"
+    (etc+"kettle/.kettle").install libexec+"pwd/kettle.pwd"
+    (etc+"kettle/simple-jndi").mkpath
 
-    # We don't assume that kitchen and pan are in anyway unique command names so we'll prepend "pdi"
-    %w[kitchen pan].each do |command|
-      wrapper_file = libexec + command
-      wrapper_file.write command_wrapper_file_content(command)
-      chmod 0755, wrapper_file
-      bin.install_symlink wrapper_file => "pdi#{command}"
+    (var+"log/kettle").mkpath
+
+    # We don't assume that carte, kitchen or pan are in anyway unique command names so we'll prepend "pdi"
+    %w[carte kitchen pan].each do |command|
+      (bin+"pdi#{command}").write_env_script libexec+"#{command}.sh", :BASEDIR => libexec
     end
-
-    carte_password_config_file = etc + "kettle/pwd/kettle.pwd"
-    carte_password_config_file.write carte_password_config_content unless carte_password_config_file.exist?
-
-    carte_server_config_file = etc + "kettle/carte.xml"
-    carte_server_config_file.write carte_server_config_content unless carte_server_config_file.exist?
-  end
-
-  def command_wrapper_file_content(command); <<-EOS.undent
-    #!/bin/bash
-
-    cd /usr/local/opt/kettle/libexec/
-    ./#{command}.sh "$@"
-    EOS
-  end
-
-  def carte_password_config_content; <<-EOS.undent
-    cluster:cluster
-    EOS
-  end
-
-  def carte_server_config_content; <<-EOS.undent
-    <?xml version="1.0" encoding="UTF-8"?>
-    <slave_config>
-      <!-- Uncomment to specify a local repository -->
-      <!--
-      <repository>
-        <name>FOO</name>
-      </repository>
-      -->
-      <slaveserver>
-        <name>localhost</name>
-        <hostname>localhost</hostname>
-        <port>8080</port>
-        <username>cluster</username>
-        <password>cluster</password>
-        <master>N</master>
-      </slaveserver>
-    </slave_config>
-    EOS
   end
 
   def plist; <<-EOS.undent
@@ -69,11 +29,9 @@ class Kettle < Formula
         <string>#{plist_name}</string>
         <key>ProgramArguments</key>
         <array>
-          <string>#{opt_libexec}/carte.sh</string>
-          <string>#{etc}/kettle/carte.xml</string>
+          <string>#{bin}/pdicarte</string>
+          <string>#{etc}/kettle/carte-config.xml</string>
         </array>
-        <key>WorkingDirectory</key>
-        <string>#{etc}/kettle</string>
         <key>EnvironmentVariables</key>
         <dict>
           <key>KETTLE_HOME</key>
@@ -90,15 +48,8 @@ class Kettle < Formula
     EOS
   end
 
-  def caveats; <<-EOS.undent
-    The `kitchen` and `pan` scripts have been installed
-    under the names `pdikitchen` and `pdipan`.
-  EOS
-  end
-
   test do
-    %w[pdikitchen pdipan].each do |command|
-      assert_equal "6", shell_output("#{bin}/#{command} -version > /dev/null 2>&1; echo $?").strip
-    end
+    system "#{bin}/pdikitchen", "-file=#{libexec}/samples/jobs/Slowly\ Changing\ Dimension/create\ -\ populate\ -\ update\ slowly\ changing\ dimension.kjb", "-level=RowLevel"
+    system "#{bin}/pdipan", "-file=#{libexec}/samples/transformations/Encrypt\ Password.ktr", "-level=RowLevel"
   end
 end
