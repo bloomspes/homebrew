@@ -549,15 +549,13 @@ module Homebrew
     end
 
     def check_results
-      status = :passed
-      steps.each do |step|
+      steps.all? do |step|
         case step.status
-        when :passed  then next
+        when :passed  then true
         when :running then raise
-        when :failed  then status = :failed
+        when :failed  then false
         end
       end
-      status == :passed
     end
 
     def formulae
@@ -666,7 +664,14 @@ module Homebrew
       jenkins = ENV['JENKINS_HOME']
       job = ENV['UPSTREAM_JOB_NAME']
       id = ENV['UPSTREAM_BUILD_ID']
-      raise "Missing Jenkins variables!" unless jenkins and job and id
+      raise "Missing Jenkins variables!" if !jenkins || !job || !id
+
+      bintray_user = ENV["BINTRAY_USER"]
+      bintray_key = ENV["BINTRAY_KEY"]
+      # Skip taps for now until we're using Bintray for Homebrew/homebrew
+      if !tap && (!bintray_user || !bintray_key)
+        raise "Missing BINTRAY_USER or BINTRAY_KEY variables!"
+      end
 
       ARGV << '--verbose'
 
@@ -698,6 +703,15 @@ module Homebrew
         safe_system "brew", "pull", "--clean", pull_pr
       end
 
+      existing_bottles = {}
+      Dir.glob("*.bottle*.tar.gz") do |filename|
+        # Skip taps for now until we're using Bintray for Homebrew/homebrew
+        next if tap
+        formula_name = bottle_filename_formula_name filename
+        formula = Formulary.factory formula_name
+        existing_bottles[formula_name] = !!formula.bottle
+      end
+
       ENV["GIT_AUTHOR_NAME"] = ENV["GIT_COMMITTER_NAME"]
       ENV["GIT_AUTHOR_EMAIL"] = ENV["GIT_COMMITTER_EMAIL"]
       safe_system "brew", "bottle", "--merge", "--write", *Dir["*.bottle.rb"]
@@ -708,6 +722,43 @@ module Homebrew
       tag = pr ? "pr-#{pr}" : "testing-#{number}"
       safe_system "git", "push", "--force", remote, "master:master", ":refs/tags/#{tag}"
 
+      # Bintray upload (will take over soon)
+      repo = if tap
+        tap.sub("/", "-") + "-bottles"
+      else
+        "bottles"
+      end
+
+      formula_packaged = {}
+
+      Dir.glob("*.bottle*.tar.gz") do |filename|
+        # Skip taps for now until we're using Bintray for Homebrew/homebrew
+        next if tap
+        version = BottleVersion.parse(filename).to_s
+        formula = bottle_filename_formula_name filename
+        existing_bottle = existing_bottles[formula]
+
+        unless formula_packaged[formula]
+          repo_url = "https://api.bintray.com/packages/homebrew/#{repo}"
+          package_url = "#{repo_url}/#{formula}"
+          unless system "curl", "--silent", "--fail", "--output", "/dev/null", package_url
+            safe_system "curl", "--silent", "--fail",
+              "-u#{bintray_user}:#{bintray_key}",
+              "-H", "Content-Type: application/json",
+              "-d", "{\"name\":\"#{formula}\"}", repo_url
+            puts
+          end
+          formula_packaged[formula] = true
+        end
+
+        content_url = "https://api.bintray.com/content/homebrew/#{repo}/#{formula}/#{version}/#{filename}"
+        content_url += "?publish=1&override=1" if existing_bottle
+        safe_system "curl", "--silent", "--fail",
+          "-u#{bintray_user}:#{bintray_key}", "-T", filename, content_url
+        puts
+      end
+
+      # SourceForge upload (will be removed soon)
       path = "/home/frs/project/m/ma/machomebrew/Bottles/"
       if tap
         tap_user, tap_repo = tap.split "/"
@@ -719,6 +770,7 @@ module Homebrew
       rsync_args += Dir["*.bottle*.tar.gz"] + [url]
 
       safe_system "rsync", *rsync_args
+
       safe_system "git", "tag", "--force", tag
       safe_system "git", "push", "--force", remote, "refs/tags/#{tag}"
       return
