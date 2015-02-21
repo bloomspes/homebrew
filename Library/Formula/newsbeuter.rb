@@ -1,56 +1,34 @@
-require 'formula'
-
 class Newsbeuter < Formula
-  homepage 'http://newsbeuter.org/'
-  url 'http://www.newsbeuter.org/downloads/newsbeuter-2.8.tar.gz'
-  sha1 'de284124c840062941b500ffbd72e3f183fb2b61'
+  homepage "http://newsbeuter.org/"
+  url "http://www.newsbeuter.org/downloads/newsbeuter-2.9.tar.gz"
+  sha1 "e0d61cda874ea9b77ed27f2edfea50a6ea471894"
 
-  head 'https://github.com/akrennmair/newsbeuter.git'
+  head "https://github.com/akrennmair/newsbeuter.git"
 
-  depends_on 'pkg-config' => :build
-  depends_on 'gettext'
-  depends_on 'json-c'
-  depends_on 'libstfl'
-  depends_on 'sqlite'
+  bottle do
+    cellar :any
+    sha1 "c0ba075c6d235a851361bc6315ad81ba8a93593f" => :yosemite
+    sha1 "ba32930fd5e0213b160d39a3bce1138b3661b4f6" => :mavericks
+    sha1 "4c8e48932bacd4c7cc0d2ff7ec2c583d99692855" => :mountain_lion
+  end
+
+  depends_on "pkg-config" => :build
+  depends_on "gettext"
+  depends_on "json-c"
+  depends_on "libstfl"
+  depends_on "sqlite"
+
+  needs :cxx11
 
   def install
-    if MacOS.version > :mountain_lion and ENV.compiler == :clang
-      # see https://github.com/akrennmair/newsbeuter/issues/108
-      inreplace [
-        'include/regexmanager.h',
-        'include/rss.h',
-        'rss/rsspp_internal.h'], '<tr1/', '<'
-
-      inreplace [
-        'include/cache.h',
-        'include/controller.h',
-        'include/feedlist_formaction.h',
-        'include/formaction.h',
-        'include/itemlist_formaction.h',
-        'include/itemview_formaction.h',
-        'include/regexmanager.h',
-        'include/rss.h',
-        'include/rss_parser.h',
-        'include/view.h',
-        'rss/rsspp_internal.h',
-        'rss/parser.cpp',
-        'rss/parser_factory.cpp',
-        'src/cache.cpp',
-        'src/controller.cpp',
-        'src/feedlist_formaction.cpp',
-        'src/formaction.cpp',
-        'src/itemlist_formaction.cpp',
-        'src/itemview_formaction.cpp',
-        'src/regexmanager.cpp',
-        'src/rss.cpp',
-        'src/rss_parser.cpp',
-        'src/view.cpp',
-        'test/test.cpp'], 'tr1::', ''
-
-      ENV.append 'CXXFLAGS', '--std=c++11'
-    end
-
+    ENV.cxx11
     system "make"
     system "make", "install", "prefix=#{prefix}"
+  end
+
+  test do
+    urlfile = "urls.txt"
+    (testpath/urlfile).write "https://github.com/blog/subscribe\n"
+    assert_match /newsbeuter - Exported Feeds/m, shell_output("#{bin}/newsbeuter -e -u #{urlfile}")
   end
 end
