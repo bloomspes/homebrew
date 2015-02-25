@@ -3,6 +3,7 @@
 
 require 'utils'
 require 'formula'
+require 'cmd/tap'
 
 module Homebrew
   def tap arg

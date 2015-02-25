@@ -69,6 +69,10 @@ class FormulaText
   def has_trailing_newline?
     /\Z\n/ =~ @text
   end
+
+  def =~ regex
+    regex =~ @text
+  end
 end
 
 class FormulaAuditor
@@ -191,6 +195,12 @@ class FormulaAuditor
             EOS
         end
       end
+    end
+  end
+
+  def audit_java_home
+    if text =~ /JAVA_HOME/i && !formula.requirements.map(&:class).include?(JavaDependency)
+      problem "Use `depends_on :java` to set JAVA_HOME"
     end
   end
 
@@ -756,6 +766,7 @@ class FormulaAuditor
     audit_specs
     audit_urls
     audit_deps
+    audit_java_home
     audit_conflicts
     audit_options
     audit_patches
