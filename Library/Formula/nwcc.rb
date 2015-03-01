@@ -8,6 +8,7 @@ class Nwcc < Formula
     system "./configure", "--installprefix=#{prefix}"
     system "make"
     system "make", "install"
+    doc.install 'CROSSCOMP', 'USAGE', 'README.first' => 'README'
   end
 
 end
