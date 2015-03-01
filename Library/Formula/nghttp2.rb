@@ -1,13 +1,13 @@
 class Nghttp2 < Formula
   homepage "https://nghttp2.org"
-  url "https://github.com/tatsuhiro-t/nghttp2/releases/download/v0.7.3/nghttp2-0.7.3.tar.xz"
-  sha1 "74f6626aa7ebbc13b8f5169d10020da9acb33440"
+  url "https://github.com/tatsuhiro-t/nghttp2/releases/download/v0.7.5/nghttp2-0.7.5.tar.xz"
+  sha1 "7256ba19c031281cf2b5640cff5986c069ffcff5"
 
   bottle do
     cellar :any
-    sha1 "819e7bdcf35ddde67da11ee68120f5b45c1fdefd" => :yosemite
-    sha1 "c39244f6a7f5480f98399b1dca4626381b8adf1a" => :mavericks
-    sha1 "39f6f4ee59f7a79941120ee16f0cab5a4538cf70" => :mountain_lion
+    sha1 "1cb5328d3f05b955aa82571a9a9210dec9dd91a5" => :yosemite
+    sha1 "94a3207d6119f38bd0b68c31e3752632e2f5942c" => :mavericks
+    sha1 "5d5d1d396d4502b85a9697e593301bd44b5356ee" => :mountain_lion
   end
 
   head do
