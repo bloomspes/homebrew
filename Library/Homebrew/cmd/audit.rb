@@ -133,6 +133,14 @@ class FormulaAuditor
     if formula.class < GithubGistFormula
       problem "GithubGistFormula is deprecated, use Formula instead"
     end
+
+    if formula.class < ScriptFileFormula
+      problem "ScriptFileFormula is deprecated, use Formula instead"
+    end
+
+    if formula.class < AmazonWebServicesFormula
+      problem "AmazonWebServicesFormula is deprecated, use Formula instead"
+    end
   end
 
   @@aliases ||= Formula.aliases
@@ -318,6 +326,8 @@ class FormulaAuditor
       case p
       when %r[^http://ftp\.gnu\.org/]
         problem "ftp.gnu.org urls should be https://, not http:// (url is #{p})."
+      when %r[^http://archive\.apache\.org/]
+        problem "archive.apache.org urls should be https://, not http (url is #{p})."
       when %r[^http://code\.google\.com/]
         problem "code.google.com urls should be https://, not http (url is #{p})."
       when %r[^http://fossies\.org/]
