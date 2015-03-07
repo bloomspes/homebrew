@@ -2,14 +2,14 @@ require 'formula'
 
 class Passenger < Formula
   homepage 'https://www.phusionpassenger.com/'
-  url 'http://s3.amazonaws.com/phusion-passenger/releases/passenger-4.0.59.tar.gz'
-  sha1 '5bbbd7577fbcf59d5e8e18ba61e265b89b98f0d0'
+  url 'http://s3.amazonaws.com/phusion-passenger/releases/passenger-5.0.1.tar.gz'
+  sha1 'fb9915e854e91aebc8a16bf9429ea44515cca585'
   head 'https://github.com/phusion/passenger.git'
 
   bottle do
-    sha1 "fe7b9c8de391e5ba7e5fa34c480bded17713eda6" => :yosemite
-    sha1 "f80b6a568b59cd368001b532c20151cf9b82758e" => :mavericks
-    sha1 "a8dc7378cad2b359de9fad26bb313fbeaeee6d53" => :mountain_lion
+    sha1 "a34eeb9b144df3ca7055e7b8c28a9017b0fd2a99" => :yosemite
+    sha1 "50d32cb023c7b3f01f8e9a8a6ab57d621cbc54ec" => :mavericks
+    sha1 "3996629778e0b4fa4d549a63555f99a58ea9bba9" => :mountain_lion
   end
 
   depends_on 'pcre'
@@ -22,6 +22,8 @@ class Passenger < Formula
     rake "apache2" if build.with? "apache2-module"
     rake "nginx"
     rake "webhelper"
+
+    (libexec/"download_cache").mkpath
 
     # Fixes https://github.com/phusion/passenger/issues/1288
     rm_rf "buildout/libev"
