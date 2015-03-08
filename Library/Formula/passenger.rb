@@ -1,22 +1,20 @@
-require 'formula'
-
 class Passenger < Formula
-  homepage 'https://www.phusionpassenger.com/'
-  url 'http://s3.amazonaws.com/phusion-passenger/releases/passenger-5.0.1.tar.gz'
-  sha1 'fb9915e854e91aebc8a16bf9429ea44515cca585'
-  head 'https://github.com/phusion/passenger.git'
+  homepage "https://www.phusionpassenger.com/"
+  url "https://s3.amazonaws.com/phusion-passenger/releases/passenger-5.0.2.tar.gz"
+  sha256 "93aa200fdc47597c0dcbe32ed6c55af0751114d2c268e4d30ff7f3d7afdbebe8"
+  head "https://github.com/phusion/passenger.git"
 
   bottle do
-    sha1 "a34eeb9b144df3ca7055e7b8c28a9017b0fd2a99" => :yosemite
-    sha1 "50d32cb023c7b3f01f8e9a8a6ab57d621cbc54ec" => :mavericks
-    sha1 "3996629778e0b4fa4d549a63555f99a58ea9bba9" => :mountain_lion
+    sha256 "d61660ced7939883b714b34e25cbc559a5850fe904fcd4b06cc9a9c461ba8977" => :yosemite
+    sha256 "6ae2c4bb20003a7609c309c728f7064e4e10a8d6f0fe8c669c60b6466e581299" => :mavericks
+    sha256 "27bd9c1058d42d4eac80fdb2080e1b865fdf9b41a80f688c5199ecba0df7eeca" => :mountain_lion
   end
 
-  depends_on 'pcre'
+  depends_on "pcre"
   depends_on "openssl"
   depends_on :macos => :lion
 
-  option 'without-apache2-module', 'Disable Apache2 module'
+  option "without-apache2-module", "Disable Apache2 module"
 
   def install
     rake "apache2" if build.with? "apache2-module"
@@ -50,7 +48,7 @@ class Passenger < Formula
     system "/usr/bin/ruby", "./dev/install_scripts_bootstrap_code.rb",
       "--nginx-module-config", libexec/"bin", libexec/"ext/nginx/config"
 
-    mv libexec/'man', share
+    mv libexec/"man", share
   end
 
   def caveats
@@ -73,7 +71,7 @@ class Passenger < Formula
   test do
     ruby_libdir = `#{HOMEBREW_PREFIX}/bin/passenger-config --ruby-libdir`.strip
     if ruby_libdir != (libexec/"lib").to_s
-      raise "Invalid installation"
+      fail "Invalid installation"
     end
   end
 end
