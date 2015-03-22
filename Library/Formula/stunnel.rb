@@ -1,13 +1,13 @@
 class Stunnel < Formula
   homepage "https://www.stunnel.org/"
-  url "https://www.stunnel.org/downloads/stunnel-5.12.tar.gz"
-  mirror "http://www.usenix.org.uk/mirrors/stunnel/stunnel-5.12.tar.gz"
-  sha256 "80c3d350c9b3e4438143fcc77c915026ae338f8174bb730ff117ca438ba84847"
+  url "https://www.stunnel.org/downloads/stunnel-5.13.tar.gz"
+  mirror "http://www.usenix.org.uk/mirrors/stunnel/stunnel-5.13.tar.gz"
+  sha256 "71b4efb3814ec298124ec78386d756ee2cba9c999e7f9571bb8abcef317f04b5"
 
   bottle do
-    sha256 "ad8866b0532d2618e85b61165d9ac060ea4489d0430a13a3c7fdbe1bfdaa484c" => :yosemite
-    sha256 "5de783b7bed05933fa3074e45291b3762205a517e8e10caf260ed9bc495a5a4d" => :mavericks
-    sha256 "94a52da6f578a04b90d3d6fd5e62f77d01038db4eb2e086141279d130d123750" => :mountain_lion
+    sha256 "1c3b4e658129b79b9b08ed74a4d253ab15523bf8ce213da4b96d51a943248a17" => :yosemite
+    sha256 "648f0df1501ae6a8f84d121072f517d3d12ef9f014c4444d900aa1a74bedc1b4" => :mavericks
+    sha256 "9a0af9860faebf9e121f03ee1b377dac119659906a6b8275fe767a4a2f4f58c6" => :mountain_lion
   end
 
   # Please revision me whenever OpenSSL is updated
