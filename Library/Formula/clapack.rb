@@ -3,7 +3,7 @@ require 'formula'
 class Clapack <Formula
   url 'http://www.netlib.org/clapack/clapack-3.2.1.tgz'
   homepage 'http://www.netlib.org/clapack/'
-  md5 '040da31f3a7d4fbc9ac376c748d18d1f'
+  sha256 '6dc4c382164beec8aaed8fd2acc36ad24232c406eda6db462bd4c41d5e455fac'
 
   def patches; DATA; end
 
