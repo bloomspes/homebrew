@@ -12,7 +12,7 @@ class Clcc < Formula
   homepage 'http://clcc.sourceforge.net/'
   url 'http://sourceforge.net/projects/clcc/files/v0.3.0/clcc-0.3.0-25-src.zip',
       :using => ClccDownloadStrategy
-  md5 '7ec003cc775d1cd06e789fb054c1d695'
+  sha256 'df48fc1d66eb21c41de4eae2f68040a18c0818f8dbfa8071f011c19c538755d3'
 
   depends_on 'cmake' => :build
   depends_on 'boost'
