@@ -381,6 +381,8 @@ class FormulaAuditor
     end
 
     # Check for Google Code download urls, https:// is preferred
+    # Intentionally not extending this to SVN repositories due to certificate
+    # issues.
     urls.grep(%r[^http://.*\.googlecode\.com/files.*]) do |u|
       problem "Use https:// URLs for downloads from Google Code (url is #{u})."
     end
@@ -584,6 +586,10 @@ class FormulaAuditor
 
     if line =~ %r[(\#\{prefix\}/share/(info|man))]
       problem "\"#{$1}\" should be \"\#{#{$2}}\""
+    end
+
+    if line =~ %r[depends_on :(automake|autoconf|libtool)]
+      problem ":#{$1} is deprecated. Usage should be \"#{$1}\""
     end
 
     # Commented-out depends_on
