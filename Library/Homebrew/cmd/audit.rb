@@ -70,6 +70,14 @@ class FormulaText
     /\Z\n/ =~ @text
   end
 
+  def has_non_ascii_character?
+    /[^\x00-\x7F]/ =~ @text
+  end
+
+  def has_encoding_comment?
+    /^# (en)?coding: utf-8$/i =~ @text
+  end
+
   def =~ regex
     regex =~ @text
   end
@@ -116,6 +124,14 @@ class FormulaAuditor
 
     if text.has_END? and not text.has_DATA?
       problem "'__END__' was found, but 'DATA' is not used"
+    end
+
+    if text.has_non_ascii_character? and not text.has_encoding_comment?
+      problem "Found non-ASCII character: add `# encoding: UTF-8` in the first line"
+    end
+
+    if text.has_encoding_comment? and not text.has_non_ascii_character?
+      problem "Remove the redundant `# encoding: UTF-8`"
     end
 
     unless text.has_trailing_newline?
@@ -206,12 +222,6 @@ class FormulaAuditor
     end
   end
 
-  def audit_java_home
-    if text =~ /JAVA_HOME/i && !formula.requirements.map(&:class).include?(JavaDependency)
-      problem "Use `depends_on :java` to set JAVA_HOME"
-    end
-  end
-
   def audit_conflicts
     formula.conflicts.each do |c|
       begin
@@ -231,6 +241,32 @@ class FormulaAuditor
       if o.name !~ /with(out)?-/ && o.name != "c++11" && o.name != "universal" && o.name != "32-bit"
         problem "Options should begin with with/without. Migrate '--#{o.name}' with `deprecated_option`."
       end
+    end
+  end
+
+  def audit_desc
+    # For now, only check the description when using `--strict`
+    return unless @strict
+
+    desc = formula.desc
+
+    unless desc and desc.length > 0
+      problem "Formula should have a desc (Description)."
+      return
+    end
+
+    # Make sure the formula name plus description is no longer than 80 characters
+    linelength = formula.name.length + ": ".length + desc.length
+    if linelength > 80
+      problem "Description is too long. \"name: desc\" should be less than 80 characters (currently #{linelength})."
+    end
+
+    if desc =~ %r[[Cc]ommandline]
+      problem "It should be \"command-line\", not \"commandline\"."
+    end
+
+    if desc =~ %r[[Cc]ommand line]
+      problem "It should be \"command-line\", not \"command line\"."
     end
   end
 
@@ -338,6 +374,14 @@ class FormulaAuditor
       end
 
       spec.patches.select(&:external?).each { |p| audit_patch(p) }
+    end
+
+    %w[Stable Devel].each do |name|
+      next unless spec = formula.send(name.downcase)
+      version = spec.version
+      if version.to_s !~ /\d/
+        problem "#{name}: version (#{version}) is set to a string without a digit"
+      end
     end
 
     if formula.stable && formula.devel
@@ -597,8 +641,12 @@ class FormulaAuditor
       problem "Define method #{$1.inspect} in the class body, not at the top-level"
     end
 
-    if line =~ /ENV.fortran/
+    if line =~ /ENV.fortran/ && !formula.requirements.map(&:class).include?(FortranDependency)
       problem "Use `depends_on :fortran` instead of `ENV.fortran`"
+    end
+
+    if line =~ /JAVA_HOME/i && !formula.requirements.map(&:class).include?(JavaDependency)
+      problem "Use `depends_on :java` to set JAVA_HOME"
     end
 
     if line =~ /depends_on :(.+) (if.+|unless.+)$/
@@ -684,9 +732,9 @@ class FormulaAuditor
     audit_file
     audit_class
     audit_specs
+    audit_desc
     audit_homepage
     audit_deps
-    audit_java_home
     audit_conflicts
     audit_options
     audit_patches
