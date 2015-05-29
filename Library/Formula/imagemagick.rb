@@ -8,9 +8,10 @@ class Imagemagick < Formula
        :using => :svn
 
   bottle do
-    sha256 "ca79e5b8ef98a9d577e7ea2d5a10f641936f57657ddab9d6185eb3a74085903e" => :yosemite
-    sha256 "50b71ef44199b01f4e8f8ff9f2c48952208f53949b11a94f1f8ff3861e6afcd5" => :mavericks
-    sha256 "bb3620483d2116b2786a10fe3caa94db9104cca1208c7907eb267a60fb22d130" => :mountain_lion
+    revision 3
+    sha256 "c85bfcf15fe506a723d26184ed4ae23a2356b7f1fd9e755905dc2869db339262" => :yosemite
+    sha256 "3e31e7d364dfb35a61a34085d4de6d0143c1409324d099d1ddbbb5acc4cc9963" => :mavericks
+    sha256 "ab34b7cee583838f6350e17e6fc8bceebe6e5a849fb70c8c5a48029c4cb04790" => :mountain_lion
   end
 
   deprecated_option "enable-hdri" => "with-hdri"
@@ -18,6 +19,7 @@ class Imagemagick < Formula
   option "with-fftw", "Compile with FFTW support"
   option "with-hdri", "Compile with HDRI support"
   option "with-jp2", "Compile with Jpeg2000 support"
+  option "with-openmp", "Compile with OpenMP support"
   option "with-perl", "enable build/install of PerlMagick"
   option "with-quantum-depth-8", "Compile with a quantum depth of 8 bit"
   option "with-quantum-depth-16", "Compile with a quantum depth of 16 bit"
@@ -31,11 +33,11 @@ class Imagemagick < Formula
 
   depends_on "jpeg" => :recommended
   depends_on "libpng" => :recommended
+  depends_on "libtiff" => :recommended
   depends_on "freetype" => :recommended
 
   depends_on :x11 => :optional
   depends_on "fontconfig" => :optional
-  depends_on "libtiff" => :optional
   depends_on "little-cms" => :optional
   depends_on "little-cms2" => :optional
   depends_on "libwmf" => :optional
@@ -48,6 +50,8 @@ class Imagemagick < Formula
   depends_on "fftw" => :optional
   depends_on "pango" => :optional
 
+  needs :openmp if build.with? "openmp"
+
   skip_clean :la
 
   def install
@@ -59,9 +63,13 @@ class Imagemagick < Formula
       --enable-shared
       --disable-static
       --with-modules
-      --disable-openmp
     ]
 
+    if build.with? "openmp"
+      args << "--enable-openmp"
+    else
+      args << "--disable-openmp"
+    end
     args << "--disable-opencl" if build.without? "opencl"
     args << "--without-gslib" if build.without? "ghostscript"
     args << "--without-perl" if build.without? "perl"

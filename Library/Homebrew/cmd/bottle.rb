@@ -114,28 +114,25 @@ module Homebrew
 
   def bottle_formula f
     unless f.installed?
-      return ofail "Formula not installed or up-to-date: #{f.name}"
+      return ofail "Formula not installed or up-to-date: #{f.full_name}"
     end
 
     unless built_as_bottle? f
-      return ofail "Formula not installed with '--build-bottle': #{f.name}"
+      return ofail "Formula not installed with '--build-bottle': #{f.full_name}"
     end
 
     unless f.stable
-      return ofail "Formula has no stable version: #{f.name}"
+      return ofail "Formula has no stable version: #{f.full_name}"
     end
 
-    bottle_revision = 0
-
-    unless ARGV.include? "--no-revision"
-      ohai "Determining #{f.name} bottle revision..."
+    if ARGV.include? '--no-revision'
+      bottle_revision = 0
+    else
+      ohai "Determining #{f.full_name} bottle revision..."
       versions = FormulaVersions.new(f)
       bottle_revisions = versions.bottle_version_map("origin/master")[f.pkg_version]
-
-      unless bottle_revisions.empty?
-        bottle_revisions.pop if bottle_revisions.last > 0
-        bottle_revision = bottle_revisions.max + 1
-      end
+      bottle_revisions.pop if bottle_revisions.last.to_i > 0
+      bottle_revision = bottle_revisions.any? ? bottle_revisions.max.to_i + 1 : 0
     end
 
     filename = Bottle::Filename.create(f, bottle_tag, bottle_revision)
