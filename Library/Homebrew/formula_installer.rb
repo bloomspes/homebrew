@@ -610,8 +610,8 @@ class FormulaInstaller
       return if Homebrew::Hooks::Bottles.pour_formula_bottle(formula)
     end
 
-    if formula.local_bottle_path
-      downloader = LocalBottleDownloadStrategy.new(formula)
+    if (bottle_path = formula.local_bottle_path)
+      downloader = LocalBottleDownloadStrategy.new(bottle_path)
     else
       downloader = formula.bottle
       downloader.verify_download_integrity(downloader.fetch)
@@ -674,27 +674,5 @@ class FormulaInstaller
       @@locked.clear
       @hold_locks = false
     end
-  end
-end
-
-
-class Formula
-  def keg_only_text
-    s = "This formula is keg-only, which means it was not symlinked into #{HOMEBREW_PREFIX}."
-    s << "\n\n#{keg_only_reason.to_s}"
-    if lib.directory? or include.directory?
-      s <<
-        <<-EOS.undent_________________________________________________________72
-
-
-        Generally there are no consequences of this for you. If you build your
-        own software and it requires this formula, you'll need to add to your
-        build variables:
-
-        EOS
-      s << "    LDFLAGS:  -L#{opt_lib}\n" if lib.directory?
-      s << "    CPPFLAGS: -I#{opt_include}\n" if include.directory?
-    end
-    s << "\n"
   end
 end
