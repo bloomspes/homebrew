@@ -360,12 +360,8 @@ class FormulaAuditor
       EOS
     end
 
-    if desc =~ /[Cc]ommandline/
-      problem "It should be \"command-line\", not \"commandline\"."
-    end
-
-    if desc =~ /[Cc]ommand line/
-      problem "It should be \"command-line\", not \"command line\"."
+    if desc =~ %r[([Cc]ommand ?line)]
+      problem "Description should use \"command-line\" instead of \"#{$1}\""
     end
   end
 
@@ -1051,7 +1047,8 @@ class ResourceAuditor
            %r{^http://fossies\.org/},
            %r{^http://mirrors\.kernel\.org/},
            %r{^http://([^/]*\.|)bintray\.com/},
-           %r{^http://tools\.ietf\.org/}
+           %r{^http://tools\.ietf\.org/},
+           %r{^http://www\.mirrorservice\.org/}
         problem "Please use https:// for #{p}"
       when %r{^http://search\.mcpan\.org/CPAN/(.*)}i
         problem "#{p} should be `https://cpan.metacpan.org/#{$1}`"
