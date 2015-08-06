@@ -242,7 +242,7 @@ class FormulaAuditor
     if @online
       same_name_tap_formulae += @@remote_official_taps.map do |tap|
         Thread.new { Homebrew.search_tap "homebrew", tap, name }
-      end.map(&:value).flatten
+      end.flat_map(&:value)
     end
 
     same_name_tap_formulae.delete(full_name)
@@ -360,8 +360,12 @@ class FormulaAuditor
       EOS
     end
 
-    if desc =~ %r[([Cc]ommand ?line)]
+    if desc =~ /([Cc]ommand ?line)/
       problem "Description should use \"command-line\" instead of \"#{$1}\""
+    end
+
+    if desc =~ %r[^([Aa]n?)\s]
+      problem "Please remove the indefinite article \"#{$1}\" from the beginning of the description"
     end
   end
 

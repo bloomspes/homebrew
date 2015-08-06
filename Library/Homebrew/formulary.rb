@@ -43,7 +43,7 @@ class Formulary
   def self.class_s(name)
     class_name = name.capitalize
     class_name.gsub!(/[-_.\s]([a-zA-Z0-9])/) { $1.upcase }
-    class_name.gsub!("+", "x")
+    class_name.tr!("+", "x")
     class_name
   end
 
@@ -211,6 +211,8 @@ class Formulary
       return FromUrlLoader.new(ref)
     when Pathname::BOTTLE_EXTNAME_RX
       return BottleLoader.new(ref)
+    when HOMEBREW_CORE_FORMULA_REGEX
+      return FormulaLoader.new($1, core_path($1))
     when HOMEBREW_TAP_FORMULA_REGEX
       return TapLoader.new(ref)
     end
