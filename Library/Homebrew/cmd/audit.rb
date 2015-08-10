@@ -567,10 +567,6 @@ class FormulaAuditor
        Please add ENV.prepend_path \"PATH\", \"#{need_npm}"\ to def install
       EOS
     end
-
-    if text =~ /system "npm", "install"/ && text !~ /"HOME"/
-      problem "Please add ENV[\"HOME\"] = buildpath/\".brew_home\" to def install"
-    end
   end
 
   def audit_line(line, lineno)
@@ -1052,7 +1048,8 @@ class ResourceAuditor
            %r{^http://mirrors\.kernel\.org/},
            %r{^http://([^/]*\.|)bintray\.com/},
            %r{^http://tools\.ietf\.org/},
-           %r{^http://www\.mirrorservice\.org/}
+           %r{^http://www\.mirrorservice\.org/},
+           %r{^http://launchpad\.net/}
         problem "Please use https:// for #{p}"
       when %r{^http://search\.mcpan\.org/CPAN/(.*)}i
         problem "#{p} should be `https://cpan.metacpan.org/#{$1}`"

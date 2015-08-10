@@ -1,14 +1,13 @@
 class Planck < Formula
   desc "A command-line ClojureScript REPL for OS X."
   homepage "http://planck.fikesfarm.com/"
-  url "https://github.com/mfikes/planck/archive/1.3.tar.gz"
-  sha256 "82dabffc03cf16527a867782714f81b93e7bb9e7a5db9d3992b74cc74c169790"
+  url "https://github.com/mfikes/planck/archive/1.4.tar.gz"
+  sha256 "57e4fdfb3dbb80b20aa71baa40ed03fe845a442d2ddd6ba9e942b4993ed13385"
 
   bottle do
     cellar :any
-    revision 1
-    sha256 "0030ca55de4f0df65a9bba8bdbd7d338488dfe640d10d31b1419622fc7482f62" => :yosemite
-    sha256 "3bf4880b65545fd25f3dc435fbb41772fdf5010b246349cd66262924197e6022" => :mavericks
+    sha256 "e3924b3ec87a2c602aa694637e1cbb91ff6a3f64cd846fa98e00d2c81a9db088" => :yosemite
+    sha256 "d22e140fd5c76ead72472b3fa417cc4329ef9d8bee5c0bc118fd84890a05c1e0" => :mavericks
   end
 
   depends_on "leiningen" => :build
@@ -17,7 +16,7 @@ class Planck < Formula
   depends_on :macos => :mavericks
 
   def install
-    system "./build.sh"
+    system "./script/build"
     bin.install "build/Release/planck"
   end
 
