@@ -298,6 +298,13 @@ Note that these flags should only appear after a command.
 
     If no <formulae> are given, check all installed brews.
 
+  * `migrate [--force]` <formulae>:
+    Migrate renamed packages to new name, where <formulae> are old names of
+    packages.
+
+    If `--force` is passed and installed <formulae> have nil tap, then treat
+    them like packages installed from core.
+
   * `options [--compact] [--all] [--installed]` <formula>:
     Display install options specific to <formula>.
 
@@ -324,7 +331,7 @@ Note that these flags should only appear after a command.
 
   * `pin` <formulae>:
     Pin the specified <formulae>, preventing them from being upgraded when
-    issuing the `brew upgrade --all` command. See also `unpin`.
+    issuing the `brew upgrade` command. See also `unpin`.
 
   * `prune`:
     Remove dead symlinks from the Homebrew prefix. This is generally not
@@ -395,6 +402,13 @@ Note that these flags should only appear after a command.
     See the docs for examples of using the JSON:
     <https://github.com/Homebrew/homebrew/blob/master/share/doc/homebrew/Querying-Brew.md>
 
+  * `tap-pin` <tap>:
+    Pin <tap>, prioritizing its formulae over core when formula names are supplied
+    by the user. See also `tap-unpin`.
+
+  * `tap-unpin` <tap>:
+    Unpin <tap> so its formulae are no longer prioritized. See also `tap-pin`.
+
   * `test` [--devel|--HEAD] [--debug] <formula>:
     A few formulae provide a test method. `brew test <formula>` runs this
     test method. There is no standard output or return code, but it should
@@ -431,7 +445,7 @@ Note that these flags should only appear after a command.
     source. This is useful for creating patches for the software.
 
   * `unpin` <formulae>:
-    Unpin <formulae>, allowing them to be upgraded by `brew upgrade --all`. See also
+    Unpin <formulae>, allowing them to be upgraded by `brew upgrade`. See also
     `pin`.
 
   * `untap` <tap>:

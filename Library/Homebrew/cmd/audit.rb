@@ -6,6 +6,7 @@ require "official_taps"
 require "tap_migrations"
 require "cmd/search"
 require "date"
+require "formula_renames"
 
 module Homebrew
   def audit
@@ -229,6 +230,11 @@ class FormulaAuditor
       return
     end
 
+    if FORMULA_RENAMES.key? name
+      problem "'#{name}' is reserved as the old name of #{FORMULA_RENAMES[name]}"
+      return
+    end
+
     if !formula.core_formula? && Formula.core_names.include?(name)
       problem "Formula name conflicts with existing core formula."
       return
@@ -268,6 +274,10 @@ class FormulaAuditor
         rescue TapFormulaAmbiguityError
           problem "Ambiguous dependency #{dep.name.inspect}."
           next
+        end
+
+        if FORMULA_RENAMES[dep.name] == dep_f.name
+          problem "Dependency '#{dep.name}' was renamed; use newname '#{dep_f.name}'."
         end
 
         if @@aliases.include?(dep.name)
@@ -428,7 +438,8 @@ class FormulaAuditor
          %r{^http://[^/.]+\.ietf\.org},
          %r{^http://[^/.]+\.tools\.ietf\.org},
          %r{^http://www\.gnu\.org/},
-         %r{^http://code\.google\.com/}
+         %r{^http://code\.google\.com/},
+         %r{^http://bitbucket\.org/}
       problem "Please use https:// for #{homepage}"
     end
 
@@ -1049,7 +1060,8 @@ class ResourceAuditor
            %r{^http://([^/]*\.|)bintray\.com/},
            %r{^http://tools\.ietf\.org/},
            %r{^http://www\.mirrorservice\.org/},
-           %r{^http://launchpad\.net/}
+           %r{^http://launchpad\.net/},
+           %r{^http://bitbucket\.org/}
         problem "Please use https:// for #{p}"
       when %r{^http://search\.mcpan\.org/CPAN/(.*)}i
         problem "#{p} should be `https://cpan.metacpan.org/#{$1}`"

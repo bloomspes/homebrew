@@ -290,6 +290,12 @@ If \fB\-\-pinned\fR is passed, show the versions of pinned formulae, or only the
 If no \fIformulae\fR are given, check all installed brews\.
 .
 .IP "\(bu" 4
+\fBmigrate [\-\-force]\fR \fIformulae\fR: Migrate renamed packages to new name, where \fIformulae\fR are old names of packages\.
+.
+.IP
+If \fB\-\-force\fR is passed and installed \fIformulae\fR have nil tap, then treat them like packages installed from core\.
+.
+.IP "\(bu" 4
 \fBoptions [\-\-compact] [\-\-all] [\-\-installed]\fR \fIformula\fR: Display install options specific to \fIformula\fR\.
 .
 .IP
@@ -317,7 +323,7 @@ If \fB\-\-verbose\fR is passed, display detailed version information\.
 If \fB\-\-json=<version>\fR is passed, the output will be in JSON format\. The only valid version is \fBv1\fR\.
 .
 .IP "\(bu" 4
-\fBpin\fR \fIformulae\fR: Pin the specified \fIformulae\fR, preventing them from being upgraded when issuing the \fBbrew upgrade \-\-all\fR command\. See also \fBunpin\fR\.
+\fBpin\fR \fIformulae\fR: Pin the specified \fIformulae\fR, preventing them from being upgraded when issuing the \fBbrew upgrade\fR command\. See also \fBunpin\fR\.
 .
 .IP "\(bu" 4
 \fBprune\fR: Remove dead symlinks from the Homebrew prefix\. This is generally not needed, but can be useful when doing DIY installations\.
@@ -379,6 +385,12 @@ Pass \fB\-\-installed\fR to get information on installed taps\.
 See the docs for examples of using the JSON: \fIhttps://github\.com/Homebrew/homebrew/blob/master/share/doc/homebrew/Querying\-Brew\.md\fR
 .
 .IP "\(bu" 4
+\fBtap\-pin\fR \fItap\fR: Pin \fItap\fR, prioritizing its formulae over core when formula names are supplied by the user\. See also \fBtap\-unpin\fR\.
+.
+.IP "\(bu" 4
+\fBtap\-unpin\fR \fItap\fR: Unpin \fItap\fR so its formulae are no longer prioritized\. See also \fBtap\-pin\fR\.
+.
+.IP "\(bu" 4
 \fBtest\fR [\-\-devel|\-\-HEAD] [\-\-debug] \fIformula\fR: A few formulae provide a test method\. \fBbrew test <formula>\fR runs this test method\. There is no standard output or return code, but it should generally indicate to the user if something is wrong with the installed formula\.
 .
 .IP
@@ -409,7 +421,7 @@ If \fB\-\-patch\fR is passed, patches for \fIformulae\fR will be applied to the 
 If \fB\-\-git\fR is passed, a Git repository will be initalized in the unpacked source\. This is useful for creating patches for the software\.
 .
 .IP "\(bu" 4
-\fBunpin\fR \fIformulae\fR: Unpin \fIformulae\fR, allowing them to be upgraded by \fBbrew upgrade \-\-all\fR\. See also \fBpin\fR\.
+\fBunpin\fR \fIformulae\fR: Unpin \fIformulae\fR, allowing them to be upgraded by \fBbrew upgrade\fR\. See also \fBpin\fR\.
 .
 .IP "\(bu" 4
 \fBuntap\fR \fItap\fR: Remove a tapped repository\.
