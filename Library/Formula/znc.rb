@@ -13,9 +13,10 @@ class Znc < Formula
   end
 
   bottle do
-    sha1 "4f695db064f9971100f917f35ab2bcb9ba758f84" => :yosemite
-    sha1 "6e3799aae4b598b61062eb0b67744a5caa5f264e" => :mavericks
-    sha1 "83597cccd275a3a4bf8fcc5d8dd5c9048403869a" => :mountain_lion
+    revision 1
+    sha256 "436eb30246b2ac8655323d86b0a2612715d6060edf06e0958bbf9a5b9efef74b" => :yosemite
+    sha256 "b8358a11e50cae4d7b29ea67b8243f3e738954d90b14cda9fdf622b1d1b1a380" => :mavericks
+    sha256 "6b5316549277d9eb5c10e8194323fb79f3cebd5454680c0417fd0b599d5ad0c5" => :mountain_lion
   end
 
   option "with-debug", "Compile ZNC with debug support"
@@ -27,8 +28,16 @@ class Znc < Formula
   depends_on "openssl"
   depends_on "icu4c" => :optional
 
+  needs :cxx11
+
   def install
     ENV.cxx11
+    # These need to be set in CXXFLAGS, because ZNC will embed them in its
+    # znc-buildmod script; ZNC's configure script won't add the appropriate
+    # flags itself if they're set in superenv and not in the environment.
+    ENV.append "CXXFLAGS", "-std=c++11"
+    ENV.append "CXXFLAGS", "-stdlib=libc++" if ENV.compiler == :clang
+
     args = ["--prefix=#{prefix}"]
     args << "--enable-debug" if build.with? "debug"
 
