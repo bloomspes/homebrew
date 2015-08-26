@@ -216,7 +216,13 @@ class Keg
   end
 
   def lock
-    FormulaLock.new(name).with_lock { yield }
+    FormulaLock.new(name).with_lock do
+      if oldname_opt_record
+        FormulaLock.new(oldname_opt_record.basename.to_s).with_lock { yield }
+      else
+        yield
+      end
+    end
   end
 
   def completion_installed?(shell)
@@ -303,6 +309,7 @@ class Keg
       when "dtrace" then :mkpath
       when /^gdk-pixbuf/ then :mkpath
       when "ghc" then :mkpath
+      when /^gio/ then :mkpath
       when "lua" then :mkpath
       when /^node/ then :mkpath
       when /^ocaml/ then :mkpath

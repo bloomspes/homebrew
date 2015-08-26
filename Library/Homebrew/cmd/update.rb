@@ -56,33 +56,25 @@ module Homebrew
       tap_user, tap_repo = migration.split "/"
       install_tap tap_user, tap_repo
       # update tap for each Tab
-      tabs = dir.subdirs.each.map { |d| Tab.for_keg(Keg.new(d)) }
+      tabs = dir.subdirs.map { |d| Tab.for_keg(Keg.new(d)) }
       next if tabs.first.source["tap"] != "Homebrew/homebrew"
       tabs.each { |tab| tab.source["tap"] = "#{tap_user}/homebrew-#{tap_repo}" }
       tabs.each(&:write)
     end if load_tap_migrations
 
-    # Migrate installed renamed formulae from main Homebrew repository.
-    if load_formula_renames
-      report.select_formula(:D).each do |oldname|
-        newname = FORMULA_RENAMES[oldname]
-        next unless newname
-        next unless (dir = HOMEBREW_CELLAR/oldname).directory? && !dir.subdirs.empty?
+    load_formula_renames
+    report.update_renamed
 
-        begin
-          migrator = Migrator.new(Formulary.factory("homebrew/homebrew/#{newname}"))
-          migrator.migrate
-        rescue Migrator::MigratorDifferentTapsError
-        end
+    # Migrate installed renamed formulae from core and taps.
+    report.select_formula(:R).each do |oldname, newname|
+      if oldname.include?("/")
+        user, repo, oldname = oldname.split("/", 3)
+        newname = newname.split("/", 3).last
+      else
+        user = "homebrew"
+        repo = "homebrew"
       end
-    end
 
-    # Migrate installed renamed formulae from taps
-    report.select_formula(:D).each do |oldname|
-      user, repo, oldname = oldname.split("/", 3)
-      next unless user && repo && oldname
-      tap = Tap.new(user, repo)
-      next unless newname = tap.formula_renames[oldname]
       next unless (dir = HOMEBREW_CELLAR/oldname).directory? && !dir.subdirs.empty?
 
       begin
@@ -322,14 +314,48 @@ class Report
 
     dump_formula_report :A, "New Formulae"
     dump_formula_report :M, "Updated Formulae"
+    dump_formula_report :R, "Renamed Formulae"
     dump_formula_report :D, "Deleted Formulae"
   end
 
-  def select_formula(key)
-    fetch(key, []).map do |path|
+  def update_renamed
+    renamed_formulae = []
+
+    fetch(:D, []).each do |path|
       case path.to_s
       when HOMEBREW_TAP_PATH_REGEX
-        "#{$1}/#{$2.sub("homebrew-", "")}/#{path.basename(".rb")}"
+        user = $1
+        repo = $2.sub("homebrew-", "")
+        oldname = path.basename(".rb").to_s
+        next unless newname = Tap.new(user, repo).formula_renames[oldname]
+      else
+        oldname = path.basename(".rb").to_s
+        next unless newname = FORMULA_RENAMES[oldname]
+      end
+
+      if fetch(:A, []).include?(newpath = path.dirname.join("#{newname}.rb"))
+        renamed_formulae << [path, newpath]
+      end
+    end
+
+    unless renamed_formulae.empty?
+      @hash[:A] -= renamed_formulae.map(&:last) if @hash[:A]
+      @hash[:D] -= renamed_formulae.map(&:first) if @hash[:D]
+      @hash[:R] = renamed_formulae
+    end
+  end
+
+  def select_formula(key)
+    fetch(key, []).map do |path, newpath|
+      if path.to_s =~ HOMEBREW_TAP_PATH_REGEX
+        tap = "#{$1}/#{$2.sub("homebrew-", "")}"
+        if newpath
+          ["#{tap}/#{path.basename(".rb")}", "#{tap}/#{newpath.basename(".rb")}"]
+        else
+          "#{tap}/#{path.basename(".rb")}"
+        end
+      elsif newpath
+        ["#{path.basename(".rb")}", "#{newpath.basename(".rb")}"]
       else
         path.basename(".rb").to_s
       end
@@ -338,6 +364,7 @@ class Report
 
   def dump_formula_report(key, title)
     formula = select_formula(key)
+    formula.map! { |oldname, newname| "#{oldname} -> #{newname}" } if key == :R
     unless formula.empty?
       ohai title
       puts_columns formula
