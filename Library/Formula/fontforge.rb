@@ -1,14 +1,14 @@
 class Fontforge < Formula
-  desc "Outline and bitmap font editor/converter for many formats"
+  desc "Command-line outline and bitmap font editor/converter"
   homepage "https://fontforge.github.io"
-  url "https://github.com/fontforge/fontforge/archive/20150612.tar.gz"
-  sha256 "af4997a07c96f7057f08cb5c7d71b19a0e8ac6336e0c48476471b471c0574247"
+  url "https://github.com/fontforge/fontforge/archive/20150824.tar.gz"
+  sha256 "28ab2471cb010c1fa75b8ab8191a1dded81fe1e9490aa5ff6ab4706a4c78ff27"
   head "https://github.com/fontforge/fontforge.git"
 
   bottle do
-    sha256 "318c0e6febcb410194f4bf43ebcbb798a7c4a9508e8b579448fd4629aa2dd8da" => :yosemite
-    sha256 "82fb0329ee807dd6adaa258999c5036c480d80a8e5c1c9337eef53d8f75fb5f1" => :mavericks
-    sha256 "4407ede75e6523f2f21be86af9837aead911ed5010ae59498ade768b5118d5c1" => :mountain_lion
+    sha256 "58d85fc50fe92c7266c8713d0f39bcd593116975f64f3de97661534d2798afc1" => :yosemite
+    sha256 "30e368018aea985007f5e2a7575a04095d26c7e57102ef7346de6cc5f4f43dad" => :mavericks
+    sha256 "b8005fa9e17e5d2194d3802adabcd527d94e6818c4b41714582555c55f83a4e0" => :mountain_lion
   end
 
   option "with-giflib", "Build with GIF support"
