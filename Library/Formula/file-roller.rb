@@ -1,13 +1,13 @@
 class FileRoller < Formula
   desc "GNOME archive manager"
   homepage "https://wiki.gnome.org/Apps/FileRoller"
-  url "https://download.gnome.org/sources/file-roller/3.16/file-roller-3.16.3.tar.xz"
-  sha256 "2b3a1111caba26e67b96559a3118a700dbfb6a4c6ad7ebd3e509df227995411c"
+  url "https://download.gnome.org/sources/file-roller/3.16/file-roller-3.16.4.tar.xz"
+  sha256 "5455980b2c9c7eb063d2d65560ae7ab2e7f01b208ea3947e151680231c7a4185"
 
   bottle do
-    sha256 "28b7c7a17489bf7bf443d921778c97dca8607be10a48bc17a7515c24109a12d4" => :yosemite
-    sha256 "e4d0be17adc6a550d1abbe5c934cd35edbd46624c731c284ee5357145ae5ad33" => :mavericks
-    sha256 "717007431c4b510af5dc653b0141f84c6f01e11e4cb16daf370e1d7e44af5c08" => :mountain_lion
+    sha256 "832faed719f2766810d37ecb4ef8448bd69eb6a6256c0ca89489ff364248c604" => :yosemite
+    sha256 "bb3b9af59a8ecd9d3a3d21b9df50105d92d5ff4bd1a681ef5a7882770fd0ef7e" => :mavericks
+    sha256 "0d8f25b0ffb916eacae2a8e84b993d63bb34a07148e739173590fd1a67b9adbd" => :mountain_lion
   end
 
   depends_on "pkg-config" => :build
@@ -20,10 +20,6 @@ class FileRoller < Formula
   depends_on "libarchive"
   depends_on "hicolor-icon-theme"
   depends_on "gnome-icon-theme"
-
-  # patch submitted upstream as https://bugzilla.gnome.org/show_bug.cgi?id=754362
-  # has been accepted for 3.16.4
-  patch :DATA
 
   def install
     # forces use of gtk3-update-icon-cache instead of gtk-update-icon-cache. No bugreport should
@@ -51,32 +47,3 @@ class FileRoller < Formula
     system "#{bin}/file-roller", "--version"
   end
 end
-
-__END__
-diff --git a/src/dlg-package-installer.c b/src/dlg-package-installer.c
-index 1b9d8c7..61f0dbf 100644
---- a/src/dlg-package-installer.c
-+++ b/src/dlg-package-installer.c
-@@ -22,7 +22,6 @@
- #include <config.h>
- #include <string.h>
- #include <glib/gi18n.h>
--#include <gdk/gdkx.h>
- #include <gtk/gtk.h>
- #include "dlg-package-installer.h"
- #include "gio-utils.h"
-diff --git a/src/fr-command-lrzip.c b/src/fr-command-lrzip.c
-index ad53a13..4fd2927 100644
---- a/src/fr-command-lrzip.c
-+++ b/src/fr-command-lrzip.c
-@@ -45,7 +45,11 @@ list__process_line (char     *line,
-
-	struct stat st;
-	if (stat (comm->filename, &st) == 0)
-+#ifdef __APPLE__
-+		fdata->modified = st.st_mtime;
-+#else
-		fdata->modified = st.st_mtim.tv_sec;
-+#endif
-	else
-		time(&(fdata->modified));
