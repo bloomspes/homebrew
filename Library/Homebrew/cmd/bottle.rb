@@ -76,15 +76,12 @@ module Homebrew
       Utils.popen_read("strings", "-t", "x", "-", file.to_s) do |io|
         until io.eof?
           str = io.readline.chomp
-
           next if ignores.any? { |i| i =~ str }
-
           next unless str.include? string
-
           offset, match = str.split(" ", 2)
-
           next if linked_libraries.include? match # Don't bother reporting a string if it was found by otool
-          result ||= true
+
+          result = true
 
           if ARGV.verbose?
             print_filename string, file
@@ -94,16 +91,33 @@ module Homebrew
       end
     end
 
-    put_symlink_header = false
+    absolute_symlinks_start_with_string = []
+    absolute_symlinks_rest = []
     keg.find do |pn|
       if pn.symlink? && (link = pn.readlink).absolute?
-        if !put_symlink_header && link.to_s.start_with?(string)
-          opoo "Absolute symlink starting with #{string}:"
-          puts "  #{pn} -> #{pn.resolved_path}"
-          put_symlink_header = true
+        if link.to_s.start_with?(string)
+          absolute_symlinks_start_with_string << pn
+        else
+          absolute_symlinks_rest << pn
         end
 
         result = true
+      end
+    end
+
+    if ARGV.verbose?
+      if absolute_symlinks_start_with_string.any?
+        opoo "Absolute symlink starting with #{string}:"
+        absolute_symlinks_start_with_string.each do |pn|
+          puts "  #{pn} -> #{pn.resolved_path}"
+        end
+      end
+
+      if absolute_symlinks_rest.any?
+        opoo "Absolute symlink:"
+        absolute_symlinks_rest.each do |pn|
+          puts "  #{pn} -> #{pn.resolved_path}"
+        end
       end
     end
 
@@ -205,12 +219,12 @@ module Homebrew
 
     old_spec = f.bottle_specification
     if ARGV.include?("--keep-old") && !old_spec.checksums.empty?
-      bad = [:root_url, :prefix, :cellar, :revision].any? do |field|
+      bad_fields = [:root_url, :prefix, :cellar, :revision].select do |field|
         old_spec.send(field) != bottle.send(field)
       end
-      if bad
+      if bad_fields.any?
         bottle_path.unlink if bottle_path.exist?
-        odie "--keep-old is passed but at least one of fields are not the same"
+        odie "--keep-old is passed but there are changes in: #{bad_fields.join ", "}"
       end
     end
 
@@ -259,12 +273,12 @@ module Homebrew
 
       old_spec = f.bottle_specification
       if keep_old && !old_spec.checksums.empty?
-         bad = [:root_url, :prefix, :cellar, :revision].any? do |field|
+         bad_fields = [:root_url, :prefix, :cellar, :revision].select do |field|
            old_spec.send(field) != bottle.send(field)
          end
 
-         if bad
-           ofail "--keep-old is passed but at least one of fields are not the same, skip it"
+         if bad_fields.any?
+           ofail "--keep-old is passed but there are changes in: #{bad_fields.join ", "}"
            next
          end
       end
