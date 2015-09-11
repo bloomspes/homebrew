@@ -20,14 +20,14 @@ end
 class Slimerjs < Formula
   desc "Scriptable browser for Web developers"
   homepage "https://slimerjs.org/"
-  url "https://download.slimerjs.org/releases/0.9.5/slimerjs-0.9.5-mac.tar.bz2"
-  sha256 "4333ae1c7898789c71b65ba5767cd1781290cdad36cb64d58ef289933482c81b"
+  url "https://download.slimerjs.org/releases/0.9.6/slimerjs-0.9.6-mac.tar.bz2"
+  sha256 "5c3ba9a83328a54b1fc6a6106abdd6d6b2117768f36ad43b9b0230a3ad7113cd"
   head "https://github.com/laurentj/slimerjs.git"
 
   bottle do
     cellar :any
-    sha1 "77b0703ee315c809ea9a1307b88f0a622affeedc" => :mavericks
-    sha1 "aa5654afdd8d2dc049878d2898b9fb7fa33911ab" => :mountain_lion
+    sha256 "3b9baa7f71e4e3b3472faf8e30d8e21f4a4f54e24fb894d003cb4fe539a6db1a" => :mavericks
+    sha256 "3607fb21371c48b903b5a0ed5c7211b027be3f76e7fbdccb6e44c30d5e341385" => :mountain_lion
   end
 
   # Min supported OS X version by Firefox & xulrunner is 10.6
