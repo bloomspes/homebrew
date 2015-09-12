@@ -574,10 +574,15 @@ module Homebrew
       @category = __method__
       return if @skip_homebrew
       test "brew", "tests"
-      test "brew", "tests", "--no-compat" if @tap
-      readall_args = ["--aliases"]
-      readall_args << "--syntax" if MacOS.version >= :mavericks
-      test "brew", "readall", *readall_args
+      if @tap
+        test "brew", "readall", @tap
+      else
+        test "brew", "tests", "--no-compat"
+        readall_args = ["--aliases"]
+        readall_args << "--syntax" if MacOS.version >= :mavericks
+        test "brew", "readall", *readall_args
+        test "brew", "update-test"
+      end
     end
 
     def cleanup_before
