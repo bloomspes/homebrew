@@ -46,7 +46,9 @@ class Keg
         end
       end
     end
+  end
 
+  def relocate_text_files(old_prefix, new_prefix, old_cellar, new_cellar)
     files = text_files | libtool_files
 
     files.group_by { |f| f.stat.ino }.each_value do |first, *rest|
@@ -107,8 +109,13 @@ class Keg
   end
 
   def install_name_tool(*args)
+    @require_install_name_tool = true
     tool = MacOS.install_name_tool
     system(tool, *args) || raise(ErrorDuringExecution.new(tool, args))
+  end
+
+  def require_install_name_tool?
+    !!@require_install_name_tool
   end
 
   # If file is a dylib or bundle itself, look for the dylib named by

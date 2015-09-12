@@ -30,6 +30,12 @@ class Slimerjs < Formula
     sha256 "3607fb21371c48b903b5a0ed5c7211b027be3f76e7fbdccb6e44c30d5e341385" => :mountain_lion
   end
 
+  devel do
+    url "https://download.slimerjs.org/nightlies/latest-slimerjs-stable/slimerjs-0.9.7-pre-mac.tar.bz2"
+    sha256 "8817a90333154ecb52415638d418e6d90d6742fec3d80f124b739344a75da5d1"
+    version "0.9.7-pre"
+  end
+
   # Min supported OS X version by Firefox & xulrunner is 10.6
   depends_on :macos => :leopard
   depends_on FirefoxRequirement
