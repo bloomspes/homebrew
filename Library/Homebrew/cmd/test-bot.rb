@@ -18,7 +18,6 @@
 # --dry-run:       Just print commands, don't run them.
 # --fail-fast:     Immediately exit on a failing step.
 # --verbose:       Print out all logs in realtime
-# --no-verbose-install: Don't run `brew install` with `--verbose`.
 #
 # --ci-master:           Shortcut for Homebrew master branch CI options.
 # --ci-pr:               Shortcut for Homebrew pull request CI options.
@@ -155,9 +154,12 @@ module Homebrew
           working_dir.cd { exec(*@command) }
         end
         write.close
-        while line = read.gets
-          puts line if verbose
-          @output += line
+        while buf = read.read(1)
+          if verbose
+            print buf
+            $stdout.flush
+          end
+          @output << buf
         end
       ensure
         read.close
@@ -531,8 +533,7 @@ module Homebrew
       formula_fetch_options << canonical_formula_name
       test "brew", "fetch", "--retry", *formula_fetch_options
       test "brew", "uninstall", "--force", canonical_formula_name if formula.installed?
-      install_args = []
-      install_args << "--verbose" unless ARGV.include? "--no-verbose-install"
+      install_args = ["--verbose"]
       install_args << "--build-bottle" unless ARGV.include? "--no-bottle"
       install_args << "--HEAD" if ARGV.include? "--HEAD"
 
@@ -849,7 +850,12 @@ module Homebrew
     ENV["HOMEBREW_DEVELOPER"] = "1"
     ENV["HOMEBREW_SANDBOX"] = "1"
     ENV["HOMEBREW_NO_EMOJI"] = "1"
-    ARGV << "--verbose" if ENV["TRAVIS"]
+    ENV["HOMEBREW_FAIL_LOG_LINES"] = "150"
+
+    if ENV["TRAVIS"]
+      ARGV << "--verbose"
+      ENV["HOMEBREW_VERBOSE_USING_DOTS"] = "1"
+    end
 
     if ARGV.include?("--ci-master") || ARGV.include?("--ci-pr") \
        || ARGV.include?("--ci-testing")
