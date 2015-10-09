@@ -4,7 +4,7 @@ class Stlsoft < Formula
   homepage 'http://www.stlsoft.org'
   url 'http://downloads.sourceforge.net/project/stlsoft/STLSoft%201.9/1.9.121/stlsoft-1.9.121-hdrs.zip'
   version '1.9.121'
-  sha1 'ec65db7f5c71c45168c5a2df4a0f4ba03bdb0c40136abb12bc960353806942ae'
+  sha1 'cafc353de6e8c9da832a6adaa3f1a8f5ed963235'
 
   depends_on 'dos2unix' => :build
 
