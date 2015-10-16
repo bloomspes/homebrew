@@ -39,12 +39,18 @@ module Homebrew
     report = Report.new
     master_updater = Updater.new(HOMEBREW_REPOSITORY)
     master_updater.pull!
+    master_updated = master_updater.updated?
+    if master_updated
+      puts "Updated Homebrew from #{master_updater.initial_revision[0, 8]} " \
+           "to #{master_updater.current_revision[0, 8]}."
+    end
     report.update(master_updater.report)
 
     # rename Taps directories
     # this procedure will be removed in the future if it seems unnecessasry
     rename_taps_dir_if_necessary
 
+    updated_taps = []
     Tap.each do |tap|
       next unless tap.git?
 
@@ -56,12 +62,18 @@ module Homebrew
         rescue
           onoe "Failed to update tap: #{tap}"
         else
+          updated_taps << tap.name if updater.updated?
           report.update(updater.report) do |_key, oldval, newval|
             oldval.concat(newval)
           end
         end
       end
     end
+    unless updated_taps.empty?
+      puts "Updated #{updated_taps.size} tap#{plural(updated_taps.size)} " \
+           "(#{updated_taps.join(", ")})."
+    end
+    puts "Already up-to-date." unless master_updated || !updated_taps.empty?
 
     Tap.clear_cache
 
@@ -109,9 +121,8 @@ module Homebrew
     end
 
     if report.empty?
-      puts "Already up-to-date."
+      puts "No changes to formulae." if master_updated || !updated_taps.empty?
     else
-      puts "Updated Homebrew from #{master_updater.initial_revision[0, 8]} to #{master_updater.current_revision[0, 8]}."
       report.dump
     end
     Descriptions.update_cache(report)
@@ -317,6 +328,10 @@ class Updater
     map
   end
 
+  def updated?
+    initial_revision && initial_revision != current_revision
+  end
+
   private
 
   def formula_directory
@@ -425,10 +440,33 @@ class Report
 
   def dump_formula_report(key, title)
     formula = select_formula(key)
-    formula.map! { |oldname, newname| "#{oldname} -> #{newname}" } if key == :R
     unless formula.empty?
+      # Determine list item indices of installed formulae.
+      formula_installed_index = formula.each_index.select do |index|
+        name, newname = formula[index]
+        installed?(name) || (newname && installed?(newname))
+      end
+
+      # Format list items of renamed formulae.
+      if key == :R
+        formula.map! { |oldname, newname| "#{oldname} -> #{newname}" }
+      end
+
+      # Append suffix '(installed)' to list items of installed formulae.
+      formula_installed_index.each do |index|
+        formula[index] += " (installed)"
+      end
+
+      # Fetch list items of installed formulae for highlighting.
+      formula_installed = formula.values_at(*formula_installed_index)
+
+      # Dump formula list.
       ohai title
-      puts_columns formula
+      puts_columns(formula, formula_installed)
     end
+  end
+
+  def installed?(formula)
+    (HOMEBREW_CELLAR/formula.split("/").last).directory?
   end
 end
