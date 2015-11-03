@@ -117,6 +117,7 @@ class Checks
       "libntfs.*.dylib", # NTFS-3G
       "libublio.*.dylib", # NTFS-3G
       "libUFSDNTFS.dylib", # Paragon NTFS
+      "libUFSDExtFS.dylib", # Paragon ExtFS
     ]
 
     __check_stray_files "/usr/local/lib", "*.dylib", white_list, <<-EOS.undent
@@ -467,7 +468,7 @@ class Checks
       if dir.exist? && !dir.writable_real? then <<-EOS.undent
       #{dir} isn't writable.
 
-      This can happen if you "sudo make install" software that isn't managed by
+      This can happen if you "sudo make install" software that isn't managed
       by Homebrew. If a formula tries to write a file to this directory, the
       install will fail during the link step.
 
