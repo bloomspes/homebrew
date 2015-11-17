@@ -12,24 +12,17 @@ class GitCola < Formula
     sha256 "3c1cde2b3b70661603f9eb94d3d0560ceaf27b11b98edb2b68b3bf524c444751" => :mavericks
   end
 
-  option "with-docs", "Build man pages using asciidoc and xmlto"
+  option "with-docs", "Build manpages and HTML docs"
 
   depends_on "pyqt"
-
-  if build.with? "docs"
-    # these are needed to build man pages
-    depends_on "asciidoc"
-    depends_on "xmlto"
-  end
+  depends_on "sphinx-doc" => :build if build.with? "docs"
 
   def install
     system "make", "prefix=#{prefix}", "install"
 
     if build.with? "docs"
-      system "make", "-C", "share/doc/git-cola",
-                     "-f", "Makefile.asciidoc",
-                     "prefix=#{prefix}",
-                     "install", "install-html"
+      system "make", "install-doc", "prefix=#{prefix}",
+             "SPHINXBUILD=#{Formula["sphinx-doc"].opt_bin}/sphinx-build"
     end
   end
 
