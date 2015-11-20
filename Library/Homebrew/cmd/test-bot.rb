@@ -880,7 +880,7 @@ module Homebrew
 
     if ARGV.include?("--ci-master") || ARGV.include?("--ci-pr") \
        || ARGV.include?("--ci-testing")
-      ARGV << "--cleanup" if ENV["JENKINS_HOME"] || ENV["TRAVIS"]
+      ARGV << "--cleanup" if ENV["JENKINS_HOME"]
       ARGV << "--junit" << "--local"
     end
     if ARGV.include? "--ci-master"
