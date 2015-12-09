@@ -76,6 +76,7 @@ module Homebrew
     puts "Already up-to-date." unless master_updated || !updated_taps.empty?
 
     Tap.clear_cache
+    Tap.each(&:link_manpages)
 
     # automatically tap any migrated formulae's new tap
     report.select_formula(:D).each do |f|
@@ -422,7 +423,7 @@ class Report
         next unless newname = Tap.fetch($1, $2).formula_renames[oldname]
       else
         oldname = path.basename(".rb").to_s
-        next unless newname = FORMULA_RENAMES[oldname]
+        next unless newname = CoreFormulaRepository.instance.formula_renames[oldname]
       end
 
       if fetch(:A, []).include?(newpath = path.dirname.join("#{newname}.rb"))
