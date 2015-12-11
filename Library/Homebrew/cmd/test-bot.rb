@@ -22,7 +22,6 @@
 # --ci-pr:               Shortcut for Homebrew pull request CI options.
 # --ci-testing:          Shortcut for Homebrew testing CI options.
 # --ci-upload:           Homebrew CI bottle upload.
-# --ci-reset-and-update: Homebrew CI repository and tap reset and update.
 
 require "formula"
 require "utils"
@@ -49,6 +48,16 @@ module Homebrew
       if tap
         tap = Tap.fetch(tap)
         return tap unless tap.core_formula_repository?
+      end
+    end
+
+    if git_url = ENV["UPSTREAM_GIT_URL"] || ENV["GIT_URL"]
+      # Also can get tap from Jenkins GIT_URL.
+      url_path = git_url.sub(%r{^https?://github\.com/}, "").chomp("/")
+      begin
+        tap = Tap.fetch(url_path)
+        return tap unless tap.core_formula_repository?
+      rescue
       end
     end
 
@@ -749,20 +758,6 @@ module Homebrew
     end
   end
 
-  def test_bot_ci_reset_and_update
-    Tap.each do |tap|
-      next unless tap.git?
-      cd tap.path do
-        quiet_system "git", "am", "--abort"
-        quiet_system "git", "rebase", "--abort"
-        safe_system "git", "checkout", "-f", "master"
-        safe_system "git", "reset", "--hard", "origin/master"
-      end
-    end
-
-    exec "brew", "update"
-  end
-
   def test_ci_upload(tap)
     jenkins = ENV["JENKINS_HOME"]
     job = ENV["UPSTREAM_JOB_NAME"]
@@ -820,11 +815,7 @@ module Homebrew
     tag = pr ? "pr-#{pr}" : "testing-#{number}"
     safe_system "git", "push", "--force", remote, "master:master", ":refs/tags/#{tag}"
 
-    bintray_repo = if tap.nil?
-      Bintray.repository(tap)
-    else
-      Bintray.repository(tap.name)
-    end
+    bintray_repo = Bintray.repository(tap)
     bintray_repo_url = "https://api.bintray.com/packages/homebrew/#{bintray_repo}"
     formula_packaged = {}
 
@@ -907,9 +898,7 @@ module Homebrew
       safe_system "brew", "tap", tap.name
     end
 
-    if ARGV.include? "--ci-reset-and-update"
-      return test_bot_ci_reset_and_update
-    elsif ARGV.include? "--ci-upload"
+    if ARGV.include? "--ci-upload"
       return test_ci_upload(tap)
     end
 
