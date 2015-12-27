@@ -1,8 +1,8 @@
 class RubyBuild < Formula
   desc "Install various Ruby versions and implementations"
   homepage "https://github.com/rbenv/ruby-build"
-  url "https://github.com/rbenv/ruby-build/archive/v20151216.tar.gz"
-  sha256 "90e63530134ff47a981d5875f8716ccfa5a235251231e7359bd2b8c147c335c1"
+  url "https://github.com/rbenv/ruby-build/archive/v20151226.tar.gz"
+  sha256 "2472ff3de8880c7f039b8795031428088877a2aec1216cc95b49d555665f4f39"
 
   bottle :unneeded
 
