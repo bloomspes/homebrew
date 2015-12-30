@@ -592,3 +592,32 @@ module GitHub
     open(uri) { |json| json["private"] }
   end
 end
+
+def disk_usage_readable(size_in_bytes)
+  if size_in_bytes >= 1_073_741_824
+    size = size_in_bytes.to_f / 1_073_741_824
+    unit = "G"
+  elsif size_in_bytes >= 1_048_576
+    size = size_in_bytes.to_f / 1_048_576
+    unit = "M"
+  elsif size_in_bytes >= 1_024
+    size = size_in_bytes.to_f / 1_024
+    unit = "K"
+  else
+    size = size_in_bytes
+    unit = "B"
+  end
+
+  # avoid trailing zero after decimal point
+  if (size * 10).to_i % 10 == 0
+    "#{size.to_i}#{unit}"
+  else
+    "#{"%.1f" % size}#{unit}"
+  end
+end
+
+def number_readable(number)
+  numstr = number.to_i.to_s
+  (numstr.size - 3).step(1, -3) { |i| numstr.insert(i, ",") }
+  numstr
+end
