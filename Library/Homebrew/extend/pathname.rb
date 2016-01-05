@@ -26,18 +26,18 @@ module DiskUsageExtension
   private
 
   def compute_disk_usage
-    if self.directory?
+    if directory?
       @file_count = 0
       @disk_usage = 0
-      self.find do |f|
-        if !f.directory? && f.basename.to_s != ".DS_Store"
+      find do |f|
+        if !f.directory? && !f.symlink? && f.basename.to_s != ".DS_Store"
           @file_count += 1
           @disk_usage += f.size
         end
       end
     else
       @file_count = 1
-      @disk_usage = self.size
+      @disk_usage = size
     end
   end
 end
@@ -177,7 +177,6 @@ class Pathname
   end
   private :default_stat
 
-
   # @private
   def cp_path_sub(pattern, replacement)
     raise "#{self} does not exist" unless self.exist?
@@ -229,7 +228,6 @@ class Pathname
   rescue Errno::EACCES, Errno::ENOENT
     false
   end
-
 
   # @private
   def version

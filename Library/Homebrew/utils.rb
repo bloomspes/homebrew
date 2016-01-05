@@ -293,7 +293,7 @@ end
 
 def curl(*args)
   brewed_curl = HOMEBREW_PREFIX/"opt/curl/bin/curl"
-  curl = if MacOS.version <= "10.6" && brewed_curl.exist?
+  curl = if MacOS.version <= "10.8" && brewed_curl.exist?
     brewed_curl
   else
     Pathname.new "/usr/bin/curl"
@@ -359,6 +359,19 @@ def which(cmd, path = ENV["PATH"])
     return Pathname.new(pcmd) if File.file?(pcmd) && File.executable?(pcmd)
   end
   nil
+end
+
+def which_all(cmd, path = ENV["PATH"])
+  path.split(File::PATH_SEPARATOR).map do |p|
+    begin
+      pcmd = File.expand_path(cmd, p)
+    rescue ArgumentError
+      # File.expand_path will raise an ArgumentError if the path is malformed.
+      # See https://github.com/Homebrew/homebrew/issues/32789
+      next
+    end
+    Pathname.new(pcmd) if File.file?(pcmd) && File.executable?(pcmd)
+  end.compact.uniq
 end
 
 def which_editor

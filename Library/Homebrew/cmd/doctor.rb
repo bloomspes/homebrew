@@ -92,6 +92,31 @@ class Checks
     end
   end
 
+  # Anaconda installs multiple system & brew dupes, including OpenSSL, Python,
+  # sqlite, libpng, Qt, etc. Regularly breaks compile on Vim, MacVim and others.
+  # Is flagged as part of the *-config script checks below, but people seem
+  # to ignore those as warnings rather than extremely likely breakage.
+  def check_for_anaconda
+    return unless which("anaconda")
+    return unless which("python")
+
+    anaconda = which("anaconda").realpath.dirname
+    python_binary = Utils.popen_read which("python"), "-c", "import sys; sys.stdout.write(sys.executable)"
+    python = Pathname.new(python_binary).realpath.dirname
+
+    # Only warn if Python lives with Anaconda, since is most problematic case.
+    if python == anaconda then <<-EOS.undent
+      Anaconda is known to frequently break Homebrew builds, including Vim and
+      MacVim, due to bundling many duplicates of system and Homebrew-available
+      tools.
+
+      If you encounter a build failure please temporarily remove Anaconda
+      from your $PATH and attempt the build again prior to reporting the
+      failure to us. Thanks!
+    EOS
+    end
+  end
+
   def __check_stray_files(dir, pattern, white_list, message)
     return unless File.directory?(dir)
 
@@ -677,9 +702,10 @@ class Checks
   end
 
   def check_for_bad_curl
-    if MacOS.version <= "10.6" && !Formula["curl"].installed? then <<-EOS.undent
-      The system curl on 10.6 and below is often incapable of supporting
+    if MacOS.version <= "10.8" && !Formula["curl"].installed? then <<-EOS.undent
+      The system curl on 10.8 and below is often incapable of supporting
       modern secure connections & will fail on fetching formulae.
+
       We recommend you:
         brew install curl
       EOS
