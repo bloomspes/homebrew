@@ -11,9 +11,10 @@ class Imagemagick < Formula
   head "http://git.imagemagick.org/repos/ImageMagick.git"
 
   bottle do
-    sha256 "ebeb3141f7b042d4f3c8f1b54b237691734cc1723cd1fe2ef6240bc76f2ce243" => :el_capitan
-    sha256 "33e8e9f8547bbf50a3d58583f728597b71194e709c71cfe82e96c590f213f00a" => :yosemite
-    sha256 "7c38748613ad7469aa2cb2063191138018368b036ba1cf8fc01049d2dfea516b" => :mavericks
+    revision 1
+    sha256 "5f955d99007402e7d592d23cff805e12c8ed2fd3d19c48bd54aae1d9f932400a" => :el_capitan
+    sha256 "0bbc3ed4700695ec0af1b1cd8d4e912ab2f3c903848fc58b83a5e44152684a9c" => :yosemite
+    sha256 "4590dd156ac09d9e6c2ee01be14eb4e7096867add47ed1b559b01905940fdecd" => :mavericks
   end
 
   deprecated_option "enable-hdri" => "with-hdri"
@@ -57,6 +58,8 @@ class Imagemagick < Formula
   skip_clean :la
 
   def install
+    ENV.delete "PERL_MM_OPT"
+
     args = %W[
       --disable-osx-universal-binary
       --prefix=#{prefix}
@@ -74,7 +77,7 @@ class Imagemagick < Formula
     end
     args << "--disable-opencl" if build.without? "opencl"
     args << "--without-gslib" if build.without? "ghostscript"
-    args << "--without-perl" if build.without? "perl"
+    args << "--with-perl" << "--with-perl-options='PREFIX=#{prefix}'" if build.with? "perl"
     args << "--with-gs-font-dir=#{HOMEBREW_PREFIX}/share/ghostscript/fonts" if build.without? "ghostscript"
     args << "--without-magick-plus-plus" if build.without? "magick-plus-plus"
     args << "--enable-hdri=yes" if build.with? "hdri"
@@ -83,7 +86,7 @@ class Imagemagick < Formula
 
     if build.with? "quantum-depth-32"
       quantum_depth = 32
-    elsif build.with? "quantum-depth-16"
+    elsif build.with?("quantum-depth-16") || build.with?("perl")
       quantum_depth = 16
     elsif build.with? "quantum-depth-8"
       quantum_depth = 8
@@ -110,14 +113,8 @@ class Imagemagick < Formula
 
   def caveats
     s = <<-EOS.undent
-      For full Perl support you must install the Image::Magick module from the CPAN.
-        https://metacpan.org/module/Image::Magick
-
-      The version of the Perl module and ImageMagick itself need to be kept in sync.
-      If you upgrade one, you must upgrade the other.
-
-      For this version of ImageMagick you should install
-      version #{version} of the Image::Magick Perl module.
+      For full Perl support you may need to adjust your PERL5LIB variable:
+        export PERL5LIB="#{HOMEBREW_PREFIX}/lib/perl5/site_perl":$PERL5LIB
     EOS
     s if build.with? "perl"
   end

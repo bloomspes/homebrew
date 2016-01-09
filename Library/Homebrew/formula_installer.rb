@@ -572,7 +572,9 @@ class FormulaInstaller
       end
     end
 
-    raise "Empty installation" if Dir["#{formula.prefix}/*"].empty?
+    if !formula.prefix.directory? || Keg.new(formula.prefix).empty_installation?
+      raise "Empty installation"
+    end
 
   rescue Exception
     ignore_interrupts do
