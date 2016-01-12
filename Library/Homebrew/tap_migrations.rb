@@ -1,7 +1,6 @@
 TAP_MIGRATIONS = {
   "adobe-air-sdk" => "homebrew/binary",
   "afuse" => "homebrew/fuse",
-  "agedu" => "homebrew/head-only",
   "aimage" => "homebrew/boneyard",
   "aplus" => "homebrew/boneyard",
   "apple-gcc42" => "homebrew/dupes",
@@ -138,7 +137,6 @@ TAP_MIGRATIONS = {
   "lilypond" => "homebrew/tex",
   "lmutil" => "homebrew/binary",
   "magit" => "homebrew/emacs",
-  "mat" => "homebrew/boneyard",
   "meld" => "homebrew/x11",
   "mesalib-glw" => "homebrew/x11",
   "mess" => "homebrew/games",
