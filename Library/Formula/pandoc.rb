@@ -5,15 +5,15 @@ class Pandoc < Formula
 
   desc "Swiss-army knife of markup format conversion"
   homepage "http://pandoc.org"
-  url "https://hackage.haskell.org/package/pandoc-1.16.0.1/pandoc-1.16.0.1.tar.gz"
-  sha256 "211bc1a4f1beaaf888d82e4e67414a3984cf494b58be49e157a1c21d9a09db1a"
+  url "https://hackage.haskell.org/package/pandoc-1.16.0.2/pandoc-1.16.0.2.tar.gz"
+  sha256 "f5f3262ef4574a111936fea0118557c523a8b0eaa7fea84b64b377b20a80f348"
 
   head "https://github.com/jgm/pandoc.git"
 
   bottle do
-    sha256 "b41aec13628331db94c3d6e49b3f57b7e3cc9d84262cdf9ec0995230e68c799b" => :el_capitan
-    sha256 "8745651aca1b3fd3727c1a80a4b1ee10084ac0b52300258b65635125686f5203" => :yosemite
-    sha256 "0478ec953e78f4aafc98fa298dea60bf26a8528db83246cca1c931f9f623c232" => :mavericks
+    sha256 "a424ef179a8c8e3db8002e80bb1be851157e9b7bc809bdf62630bd0e7cbc913b" => :el_capitan
+    sha256 "7fb2340adfe9ac8ed39d844440e04bdf0072e2afa704140f0fe44b07ef905db2" => :yosemite
+    sha256 "d3d82a8526221b647debec02301e453eda13fa2df5eea6e1ae6b48cf15281a2f" => :mavericks
   end
 
   depends_on "ghc" => :build
