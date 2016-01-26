@@ -1,12 +1,3 @@
-#!/bin/bash
-
-if [[ -z "$HOMEBREW_BREW_FILE" ]]
-then
-  # we don't use odie here, because it's only available when this script is called from brew.
-  echo "Error: $(basename "$0") must be called from brew!" >&2
-  exit 1
-fi
-
 brew() {
   "$HOMEBREW_BREW_FILE" "$@"
 }
@@ -229,7 +220,7 @@ pull() {
   trap - SIGINT
 }
 
-update-bash() {
+homebrew-update-bash() {
   local option
   local DIR
   local UPSTREAM_BRANCH
@@ -237,7 +228,6 @@ update-bash() {
   for option in "$@"
   do
     case "$option" in
-      update|update-bash) shift ;;
       --help) brew update --help; exit $? ;;
       --verbose) HOMEBREW_VERBOSE=1 ;;
       --debug) HOMEBREW_DEBUG=1;;
