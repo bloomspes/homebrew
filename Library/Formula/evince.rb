@@ -3,12 +3,12 @@ class Evince < Formula
   homepage "https://wiki.gnome.org/Apps/Evince"
   url "https://download.gnome.org/sources/evince/3.18/evince-3.18.2.tar.xz"
   sha256 "42ad6c7354d881a9ecab136ea84ff867acb942605bcfac48b6c12e1c2d8ecb17"
-  revision 1
+  revision 2
 
   bottle do
-    sha256 "75191edc36670312d866c3aea88d9d47c233e3c8e4c662a2fcc793c26810b2a7" => :el_capitan
-    sha256 "86eb70d99d5cdd2b6f327929f4a5b539f9acad07efa90e723b5d2648b5c9df51" => :yosemite
-    sha256 "2b6f3cd73566156fff7b20a8a268daf65cd755c672f0cae160e9169f9ed18c4d" => :mavericks
+    sha256 "b7a881cf237b9e4b15f1a032d5c504b9758a54e280b294a2968480a207604d06" => :el_capitan
+    sha256 "6f7d8c25f832f9a5462e622f6c85266b86373a2dd7d7b5e817d2b8795c56ea27" => :yosemite
+    sha256 "fe988fe112a403ba982bf23158bf53d6c1a340a4155700b4fbf23f5fd41b2979" => :mavericks
   end
 
   depends_on "pkg-config" => :build
@@ -23,6 +23,7 @@ class Evince < Formula
   depends_on "libspectre"
   depends_on "gobject-introspection"
   depends_on "shared-mime-info"
+  depends_on "djvulibre"
   depends_on :python if MacOS.version <= :snow_leopard
 
   def install
@@ -37,6 +38,7 @@ class Evince < Formula
                           "--disable-nautilus",
                           "--disable-schemas-compile",
                           "--enable-introspection",
+                          "--enable-djvu",
                           "--disable-browser-plugin"
     ENV.append_path "PYTHONPATH", "#{Formula["libxml2"].opt_lib}/python2.7/site-packages"
     system "make", "install"
