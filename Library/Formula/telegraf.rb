@@ -3,14 +3,14 @@ require "language/go"
 class Telegraf < Formula
   desc "Server-level metric gathering agent for InfluxDB"
   homepage "https://influxdata.com"
-  url "https://github.com/influxdata/telegraf/archive/0.10.3.tar.gz"
-  sha256 "00673003a0e190f30a69a23f51a84ce0bc9d2efb1a1142b0dfdb697524229e59"
+  url "https://github.com/influxdata/telegraf/archive/0.10.4.1.tar.gz"
+  sha256 "6114444834910b9545dc06243dd8f5dba834b82220b7ff69f3929aae12d9af37"
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "2adde3a050ac540ed4032399f0733e5cf1bc856e585dba42866a8a6871495eab" => :el_capitan
-    sha256 "921a2ab0755c6a9d799e9e5a8d363a795a6d8286ef82f6e34e66ffde31237f97" => :yosemite
-    sha256 "4c1f6283f64710f7c94af6e8e10d0fc4f252cc6025ed7a9082db75abb9368526" => :mavericks
+    sha256 "edee960086e7edc4fc6c1c9faf0e9b0d5542b197e988aa26e08eb4ebd51a31ad" => :el_capitan
+    sha256 "9510b0420da15be9c0804b3ddd6604b47fb294da87809a9f533a9fe8b18343c3" => :yosemite
+    sha256 "90d90836da7de441feeaee2b4d4443e399084c0c2e67b209f5f14970b25e1752" => :mavericks
   end
 
   depends_on "go" => :build
@@ -128,6 +128,11 @@ class Telegraf < Formula
   go_resource "github.com/matttproud/golang_protobuf_extensions" do
     url "https://github.com/matttproud/golang_protobuf_extensions.git",
     :revision => "d0c3fe89de86839aecf2e0579c40ba3bb336a453"
+  end
+
+  go_resource "github.com/miekg/dns" do
+    url "https://github.com/miekg/dns.git",
+    :revision => "e0d84d97e59bcb6561eae269c4e94d25b66822cb"
   end
 
   go_resource "github.com/mreiferson/go-snappystream" do

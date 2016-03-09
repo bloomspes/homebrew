@@ -3,14 +3,14 @@ require "language/go"
 class Influxdb < Formula
   desc "Time series, events, and metrics database"
   homepage "https://influxdata.com/time-series-platform/influxdb/"
-  url "https://github.com/influxdata/influxdb/archive/v0.10.1.tar.gz"
-  sha256 "6a66373006a249cb6ab2a2f33b924694486ee07b1d9096c3f770376d0351b703"
+  url "https://github.com/influxdata/influxdb/archive/v0.10.2.tar.gz"
+  sha256 "4d537534c96c387a3f11275680c678fc9aec819a9283143762812d5d189f8e6f"
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "4ea28e218a7805755ac516094c691f3799257f182abc06c86f6eb5caf1702d6e" => :el_capitan
-    sha256 "0ed3eec3c34d166e063375e4583ca4b9c16fb345d72f60e122749a1c057cb052" => :yosemite
-    sha256 "eff6e107c1e1ad6272464771945855d08c9bf700bafafbabd25f9e90a918a380" => :mavericks
+    sha256 "a021fa63eed5afaeb5852631a51023a34b1eff7c9877478d076d03e3df6c9199" => :el_capitan
+    sha256 "15f9ff77895b88a4d7a4b6f60597a59fd3d6715aee057514babddcce0d16c7c2" => :yosemite
+    sha256 "596f3e437b855050a1f05a68f6de053c9625492c2cd05695ead960915f86876a" => :mavericks
   end
 
   head do
@@ -31,7 +31,7 @@ class Influxdb < Formula
 
   go_resource "github.com/BurntSushi/toml" do
     url "https://github.com/BurntSushi/toml.git",
-    :revision => "312db06c6c6dbfa9899e58564bacfaa584f18ab7"
+    :revision => "a4eecd407cf4129fc902ece859a0114e4cf1a7f4"
   end
 
   go_resource "github.com/armon/go-metrics" do
@@ -41,7 +41,7 @@ class Influxdb < Formula
 
   go_resource "github.com/bmizerany/pat" do
     url "https://github.com/bmizerany/pat.git",
-    :revision => "c068ca2f0aacee5ac3681d68e4d0a003b7d1fd2c"
+    :revision => "b8a35001b773c267eb260a691f4e5499a3531600"
   end
 
   go_resource "github.com/boltdb/bolt" do
@@ -51,7 +51,7 @@ class Influxdb < Formula
 
   go_resource "github.com/davecgh/go-spew" do
     url "https://github.com/davecgh/go-spew.git",
-    :revision => "5215b55f46b2b919f50a1df0eaa5886afe4e3b3d"
+    :revision => "fc32781af5e85e548d3f1abaf0fa3dbe8a72495c"
   end
 
   go_resource "github.com/dgryski/go-bits" do
@@ -71,7 +71,7 @@ class Influxdb < Formula
 
   go_resource "github.com/golang/snappy" do
     url "https://github.com/golang/snappy.git",
-    :revision => "d1d908a252c22fd7afd36190d5cffb144aa8f777"
+    :revision => "5979233c5d6225d4a8e438cdd0b411888449ddab"
   end
 
   go_resource "github.com/hashicorp/go-msgpack" do
@@ -81,7 +81,7 @@ class Influxdb < Formula
 
   go_resource "github.com/hashicorp/raft" do
     url "https://github.com/hashicorp/raft.git",
-    :revision => "057b893fd996696719e98b6c44649ea14968c811"
+    :revision => "8fd9a2fdfd154f4b393aa24cff91e3c317efe839"
   end
 
   go_resource "github.com/hashicorp/raft-boltdb" do
@@ -144,7 +144,7 @@ class Influxdb < Formula
       if build.head?
         system "go", "install", "-ldflags", "-X main.version=0.11.0-HEAD -X main.branch=master -X main.commit=#{`git rev-parse HEAD`.strip}", "./..."
       else
-        system "go", "install", "-ldflags", "-X main.version=0.10.1 -X main.branch=0.10.0 -X main.commit=b8bb32ecad9808ef00219e7d2469514890a0987a", "./..."
+        system "go", "install", "-ldflags", "-X main.version=0.10.2 -X main.branch=0.10.0 -X main.commit=845ce867189724762a6637f17da742f2ca0a9625", "./..."
       end
     end
 
@@ -157,6 +157,8 @@ class Influxdb < Formula
 
     bin.install "bin/influxd"
     bin.install "bin/influx"
+    bin.install "bin/influx_tsm"
+    bin.install "bin/influx_stress"
     etc.install influxdb_path/"etc/config.sample.toml" => "influxdb.conf"
 
     (var/"influxdb/data").mkpath
