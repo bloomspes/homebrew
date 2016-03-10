@@ -8,9 +8,10 @@ class Thefuck < Formula
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "ea900ff0423a690981f7b76fa6d34f1ef167748a11db1c1e56dfa42d7c9b4175" => :el_capitan
-    sha256 "2faf3b98004bab4161264b29c83cf3cb80e02779e0f6ebb2df82956301e9e3af" => :yosemite
-    sha256 "e4ae4a088558bbed9dfda1a77f668bb0da68df76b4d1244ee5730cbdb1734f4a" => :mavericks
+    revision 1
+    sha256 "41470126eee1cf91235ab62a91d373b588e1cc350417ab2f43c5b211e0cf95da" => :el_capitan
+    sha256 "47e5ea23e7dc1e74026fbdd8332c9c7c926b51eed59989474039af6034fb0ae7" => :yosemite
+    sha256 "c1ba06e1c3065ba355bc2c30610a499f8881366f485ded57090e2c375fff4127" => :mavericks
   end
 
   depends_on :python if MacOS.version <= :snow_leopard
@@ -50,7 +51,8 @@ class Thefuck < Formula
     sha256 "30f98b66f3fe1069c529a491597d34a1c224a68640c82caf2ade5f88aa1405e8"
   end
 
-  # FIXME: Remove this patch in 3.5!
+  # FIXME: Remove all these patches in 3.5!
+  #
   #
   # Patch sent to upstream: https://github.com/nvbn/thefuck/pull/473
   #
@@ -59,6 +61,14 @@ class Thefuck < Formula
   # virtualenv's Python. The database packages used when creating and reading
   # the cache file must be the very same. If this package – e.g. gdbm – isn't
   # available – mostly when using system's Python – an ImportError is raised.
+  #
+  #
+  # Patch sent to upstream: https://github.com/nvbn/thefuck/pull/474
+  #
+  # Why this patch is needed: the local environment variables should be declared
+  # in order for they become available to `thefuck` command. Fish Shell alias is
+  # not affected by this regression.
+  #
   patch :DATA
 
   def install
@@ -110,3 +120,64 @@ index b1bbd42..4ae5898 100644
              # Caused when going from Python 2 to Python 3 and vice-versa
              warn("Removing possibly out-dated cache")
              os.remove(cache_path)
+diff --git a/thefuck/shells/bash.py b/thefuck/shells/bash.py
+index d6e9b2c..8f4e0e1 100644
+--- a/thefuck/shells/bash.py
++++ b/thefuck/shells/bash.py
+@@ -6,9 +6,11 @@ from .generic import Generic
+
+ class Bash(Generic):
+     def app_alias(self, fuck):
+-        alias = "TF_ALIAS={0}" \
+-                " alias {0}='PYTHONIOENCODING=utf-8" \
+-                " TF_CMD=$(TF_SHELL_ALIASES=$(alias) thefuck $(fc -ln -1)) && " \
++        # It is VERY important to have the variables declared WITHIN the alias
++        alias = "alias {0}='TF_CMD=$(TF_ALIAS={0}" \
++                " PYTHONIOENCODING=utf-8" \
++                " TF_SHELL_ALIASES=$(alias)" \
++                " thefuck $(fc -ln -1)) &&" \
+                 " eval $TF_CMD".format(fuck)
+
+         if settings.alter_history:
+diff --git a/thefuck/shells/fish.py b/thefuck/shells/fish.py
+index fff003b..bc2b2ec 100644
+--- a/thefuck/shells/fish.py
++++ b/thefuck/shells/fish.py
+@@ -14,6 +14,7 @@ class Fish(Generic):
+             return ['cd', 'grep', 'ls', 'man', 'open']
+
+     def app_alias(self, fuck):
++        # It is VERY important to have the variables declared WITHIN the alias
+         return ('function {0} -d "Correct your previous console command"\n'
+                 '  set -l fucked_up_command $history[1]\n'
+                 '  env TF_ALIAS={0} PYTHONIOENCODING=utf-8'
+diff --git a/thefuck/shells/zsh.py b/thefuck/shells/zsh.py
+index a8c0587..e522d6a 100644
+--- a/thefuck/shells/zsh.py
++++ b/thefuck/shells/zsh.py
+@@ -7,10 +7,11 @@ from .generic import Generic
+
+ class Zsh(Generic):
+     def app_alias(self, alias_name):
+-        alias = "alias {0}='TF_ALIAS={0}" \
++        # It is VERY important to have the variables declared WITHIN the alias
++        alias = "alias {0}='TF_CMD=$(TF_ALIAS={0}" \
+                 " PYTHONIOENCODING=utf-8" \
+-                ' TF_SHELL_ALIASES=$(alias)' \
+-                " TF_CMD=$(thefuck $(fc -ln -1 | tail -n 1)) &&" \
++                " TF_SHELL_ALIASES=$(alias)" \
++                " thefuck $(fc -ln -1 | tail -n 1)) &&" \
+                 " eval $TF_CMD".format(alias_name)
+
+         if settings.alter_history:
+diff --git a/thefuck/types.py b/thefuck/types.py
+index dcd99b6..81a7d1b 100644
+--- a/thefuck/types.py
++++ b/thefuck/types.py
+@@ -282,5 +282,5 @@ class CorrectedCommand(object):
+             compatibility_call(self.side_effect, old_cmd, self.script)
+         # This depends on correct setting of PYTHONIOENCODING by the alias:
+         logs.debug(u'PYTHONIOENCODING: {}'.format(
+-            os.environ.get('PYTHONIOENCODING', '>-not-set-<')))
++            os.environ.get('PYTHONIOENCODING', '!!not-set!!')))
+         print(self.script)
