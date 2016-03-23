@@ -1,14 +1,14 @@
 class CrystalLang < Formula
   desc "Fast and statically typed, compiled language with Ruby-like syntax"
   homepage "http://crystal-lang.org/"
-  url "https://github.com/crystal-lang/crystal/archive/0.14.1.tar.gz"
-  sha256 "2f593ea68683e26cd8971619b3860b15b85048f27648e34b7ed5a41116ad2ecb"
+  url "https://github.com/crystal-lang/crystal/archive/0.14.2.tar.gz"
+  sha256 "0fdbb8c0ebbc1da0024b19fac193763654b474e3e2db957a4543bfc5ad5dba67"
   head "https://github.com/manastech/crystal.git"
 
   bottle do
-    sha256 "10453e40bc070cb34bf2e1357d5c24e1539894a0f7d29bc552097958cdc9bac6" => :el_capitan
-    sha256 "37314aa8bd4e21f034f6cc27ace8a18d42b30cd2ee15b9ec6cdeba5041749e34" => :yosemite
-    sha256 "0bc6019a6f9130dbdbcad526451e211d2ce928a3a02787d61fb96a6670e10ae1" => :mavericks
+    sha256 "c6791c15e931c8c4894af36dfdd6689ff63a94677d0828772d5473443c62951d" => :el_capitan
+    sha256 "25bc1c73b8a0fc24d66b66ceeab8a0a3a8674ea55fa3f94b9c54b212e17a2b42" => :yosemite
+    sha256 "dac7f07a399532b349acf99095e51647c70754e9ef2565d3aed4465e1dd95008" => :mavericks
   end
 
   option "without-release", "Do not build the compiler in release mode"
