@@ -1,14 +1,14 @@
 class Conan < Formula
   desc "Distributed, open source, package manager for C/C++"
   homepage "https://github.com/conan-io/conan"
-  url "https://pypi.python.org/packages/source/c/conan/conan-0.8.1.tar.gz"
-  sha256 "8c232415eca75d369bd16967f415edba76737ff13e5f80cec9b05b1b81dbde8e"
+  url "https://pypi.python.org/packages/source/c/conan/conan-0.8.3.tar.gz"
+  sha256 "88c9428b276378e379dc06a07a459c95d7fb312f401ab00fbdcf77d84fee1ed0"
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "7a7ee459c3550a3465c8d479ed8f2662c33a83143f1cad1f86a1adfdbd7c74b2" => :el_capitan
-    sha256 "8315bf8a37d8f6a362b25e689461732c1408372028b0134b8aa78ba981ed30eb" => :yosemite
-    sha256 "3a975903ffe8269e1ae60000c3044543c4bbda619312d2e22d51264a6605d329" => :mavericks
+    sha256 "17debcdfea2e4adba9d0e34963a70acafe461d275db291985f940f1314dc9939" => :el_capitan
+    sha256 "d5a7e480f9cb5cd7d73adb84bafa2220231d81868d47cf2aa82cdb13ab81c03a" => :yosemite
+    sha256 "a0aab476fad58911786139f47eb2af5e2f125513bdbd2b057ae1258792b75d80" => :mavericks
   end
 
   depends_on :python if MacOS.version <= :snow_leopard
