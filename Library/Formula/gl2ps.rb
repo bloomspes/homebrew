@@ -3,12 +3,13 @@ class Gl2ps < Formula
   homepage "http://www.geuz.org/gl2ps/"
   url "http://geuz.org/gl2ps/src/gl2ps-1.3.9.tgz"
   sha256 "8a680bff120df8bcd78afac276cdc38041fed617f2721bade01213362bcc3640"
+  revision 1
 
   bottle do
     cellar :any
-    sha256 "660715c44772d7fb7463216af03797a9f377390550857fafb60ff07e8307d54c" => :el_capitan
-    sha256 "2641d23b28b8800c346e6c5b5579b56cbbfb5922086d9c68b3f51a243054c45f" => :yosemite
-    sha256 "601ef91d17ee6390113b98ce744493eb71ab0d17026994dfa64f6a83783b6d79" => :mavericks
+    sha256 "af82ad002b72c82f5b8a044cd00e1ad95f2ec44817587c1840e17b97c607bebc" => :el_capitan
+    sha256 "482602fc793e919858a03aedfd1c40efd1763fea28fa71f02831ca1b906a3d9d" => :yosemite
+    sha256 "89f18a491419c552d7b833290f9e7e25dfecece961ed2c0cd9c68a8352a1015a" => :mavericks
   end
 
   depends_on "cmake" => :build
